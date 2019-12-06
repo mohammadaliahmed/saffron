@@ -14,7 +14,9 @@ import com.saffron.club.Activities.CartManagement.CartActivity;
 import com.saffron.club.Adapters.HomePageCategoryAdapter;
 import com.saffron.club.Adapters.MainSliderAdapter;
 import com.saffron.club.Models.Category;
+import com.saffron.club.Models.Product;
 import com.saffron.club.NetworkResponses.CategoryResponse;
+import com.saffron.club.NetworkResponses.ProductResponse;
 import com.saffron.club.R;
 import com.saffron.club.Utils.AppConfig;
 import com.saffron.club.Utils.CommonUtils;
@@ -63,6 +65,8 @@ public class MainActivity extends AppCompatActivity
     private String timeSet;
     private String persons;
 
+    public static List<Product> additionalItems = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +80,6 @@ public class MainActivity extends AppCompatActivity
             getSupportActionBar().setElevation(0);
         }
         this.setTitle("Saffron Club");
-
         initViewPager();
         initDrawer();
         initCategory();
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(MainActivity.this, BookTable.class));
             }
         });
+        getProductsDataFromDB();
     }
 
 
@@ -109,7 +113,13 @@ public class MainActivity extends AppCompatActivity
                     CategoryResponse object = response.body();
                     if (object != null && object.getData() != null) {
                         if (object.getData().size() > 0) {
-                            itemList = object.getData();
+                            for (Category category : object.getData()) {
+                                if (!category.getName().equalsIgnoreCase("Additional Items")) {
+                                    itemList.add(category);
+                                }else{
+
+                                }
+                            }
                             adapter.setItemList(itemList);
                         } else {
                             CommonUtils.showToast("No category Data");
@@ -123,6 +133,40 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<CategoryResponse> call, Throwable t) {
+                CommonUtils.showToast(t.getMessage());
+            }
+        });
+    }
+    private void getProductsDataFromDB() {
+        UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
+        Call<ProductResponse> call = getResponse.getProducts(
+                SharedPrefs.getToken()
+        );
+        call.enqueue(new Callback<ProductResponse>() {
+            @Override
+            public void onResponse(Call<ProductResponse> call, Response<ProductResponse> response) {
+                if (response.isSuccessful()) {
+                    ProductResponse object = response.body();
+                    if (object != null && object.getData() != null) {
+                        if (object.getData().size() > 0) {
+                            for (Product product : object.getData()) {
+                                if (product.getcId().equalsIgnoreCase("" + 1)) {
+                                    additionalItems.add(product);
+                                }
+                            }
+//                            itemList = object.getData();
+                        } else {
+//                            CommonUtils.showToast("No products Data");
+                        }
+                    } else {
+//                        CommonUtils.showToast("There is some error");
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ProductResponse> call, Throwable t) {
                 CommonUtils.showToast(t.getMessage());
             }
         });

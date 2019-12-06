@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#ffffff</color>
     <color name="colorAccent">#871014</color>
     <color name="colorSaffron">#871014</color>
+    <color name="colorGrey">#939393</color>
     <color name="colorWhite">#ffffff</color>
     <color name="stpi_default_circle_color">#b3bdc2</color>
     <color name="stpi_default_primary_color">#00b47c</color>

@@ -3,6 +3,8 @@ package com.saffron.club.Models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class Product {
     @SerializedName("id")
     @Expose
@@ -40,6 +42,17 @@ public class Product {
     @SerializedName("updated_at")
     @Expose
     private String updatedAt;
+    @SerializedName("extras")
+    @Expose
+    private List<Extra> extras = null;
+
+    public List<Extra> getExtras() {
+        return extras;
+    }
+
+    public void setExtras(List<Extra> extras) {
+        this.extras = extras;
+    }
 
     public Integer getId() {
         return id;

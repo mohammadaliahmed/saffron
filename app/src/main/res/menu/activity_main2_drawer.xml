@@ -20,10 +20,10 @@
             android:id="@+id/nav_terms"
             android:icon="@drawable/ic_terms"
             android:title="Terms &amp; Conditions" />
-        <item
-            android:id="@+id/nav_contact"
-            android:icon="@drawable/ic_help"
-            android:title="Contact" />
+        <!--<item-->
+            <!--android:id="@+id/nav_contact"-->
+            <!--android:icon="@drawable/ic_help"-->
+            <!--android:title="Contact" />-->
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/logout"

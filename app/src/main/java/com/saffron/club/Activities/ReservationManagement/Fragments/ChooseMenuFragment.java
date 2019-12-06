@@ -161,7 +161,7 @@ public class ChooseMenuFragment extends Fragment {
         wholeLayout.setVisibility(View.VISIBLE);
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
         Call<AddToCartResponse> call = getResponse.addToCart(
-                SharedPrefs.getToken(), "" + product.getId()
+                SharedPrefs.getToken(), "" + product.getId(),"0"
         );
         call.enqueue(new Callback<AddToCartResponse>() {
             @Override

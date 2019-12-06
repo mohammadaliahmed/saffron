@@ -36,6 +36,17 @@ public class MenuModel {
     @SerializedName("pro")
     @Expose
     private Product product;
+    @SerializedName("variation")
+    @Expose
+    private Extra variation;
+
+    public Extra getVariation() {
+        return variation;
+    }
+
+    public void setVariation(Extra variation) {
+        this.variation = variation;
+    }
 
     public Integer getId() {
         return id;

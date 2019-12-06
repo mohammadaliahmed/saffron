@@ -53,6 +53,7 @@ public class CartTableAdapter extends RecyclerView.Adapter<CartTableAdapter.View
             }
         });
 
+
     }
 
     @Override

@@ -7,14 +7,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.saffron.club.Models.MenuModel;
 import com.saffron.club.R;
+import com.saffron.club.Utils.AppConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CartMenuAdapter extends RecyclerView.Adapter<CartMenuAdapter.ViewHolder> {
     Context context;
@@ -44,8 +47,18 @@ public class CartMenuAdapter extends RecyclerView.Adapter<CartMenuAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         final MenuModel menuModel = itemList.get(position);
-        holder.title.setText((position + 1) + ") " + menuModel.getProduct().getName());
+        holder.title.setText(menuModel.getProduct().getName());
         holder.price.setText("$" + menuModel.getProduct().getPrice());
+
+        Glide.with(context).load(AppConfig.BASE_URL + "storage/app/" + menuModel.getProduct().getImage()).into(holder.image);
+
+        if (menuModel.getVariation() != null) {
+            holder.subtitle.setText("Option: " + menuModel.getVariation().getName());
+            holder.price.setText("$" + menuModel.getVariation().getPrice());
+        } else {
+            holder.subtitle.setText("");
+        }
+
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,8 +74,15 @@ public class CartMenuAdapter extends RecyclerView.Adapter<CartMenuAdapter.ViewHo
                 if (count[0] >= 0) {
                     count[0]++;
                     holder.quantity.setText("" + count[0]);
-                    holder.price.setText("$" + count[0] * Double.parseDouble(menuModel.getProduct().getPrice()));
-                    cartCallback.onIncrease(count[0],position);
+                    if (menuModel.getVariation() != null) {
+                        holder.price.setText("$" + count[0] * Double.parseDouble(menuModel.getVariation().getPrice()));
+
+                    } else {
+                        holder.price.setText("$" + count[0] * Double.parseDouble(menuModel.getProduct().getPrice()));
+
+                    }
+
+                    cartCallback.onIncrease(count[0], position);
 
 
                 }
@@ -74,8 +94,15 @@ public class CartMenuAdapter extends RecyclerView.Adapter<CartMenuAdapter.ViewHo
                 if (count[0] > 0) {
                     count[0]--;
                     holder.quantity.setText("" + count[0]);
-                    holder.price.setText("$" + count[0] * Double.parseDouble(menuModel.getProduct().getPrice()));
-                    cartCallback.onDecrease(count[0],position);
+                    if (menuModel.getVariation() != null) {
+                        holder.price.setText("$" + count[0] * Double.parseDouble(menuModel.getVariation().getPrice()));
+
+                    } else {
+                        holder.price.setText("$" + count[0] * Double.parseDouble(menuModel.getProduct().getPrice()));
+
+                    }
+
+                    cartCallback.onDecrease(count[0], position);
 
 
                 }
@@ -92,8 +119,9 @@ public class CartMenuAdapter extends RecyclerView.Adapter<CartMenuAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView delete;
-        TextView title, price, quantity;
+        TextView title, price, quantity, subtitle;
         ImageView decrease, increase;
+        CircleImageView image;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -103,14 +131,16 @@ public class CartMenuAdapter extends RecyclerView.Adapter<CartMenuAdapter.ViewHo
             delete = itemView.findViewById(R.id.delete);
             decrease = itemView.findViewById(R.id.decrease);
             increase = itemView.findViewById(R.id.increase);
+            image = itemView.findViewById(R.id.image);
+            subtitle = itemView.findViewById(R.id.subtitle);
         }
     }
 
     public interface CartCallbacks {
         public void onDeleteMenu(MenuModel menu, int position);
 
-        public void onIncrease(int value,int position);
+        public void onIncrease(int value, int position);
 
-        public void onDecrease(int value,int position);
+        public void onDecrease(int value, int position);
     }
 }

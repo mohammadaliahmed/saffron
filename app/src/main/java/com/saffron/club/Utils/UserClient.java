@@ -180,7 +180,8 @@ public interface UserClient {
     @FormUrlEncoded
     Call<AddToCartResponse> addToCart(
             @Header("Authorization") String auth,
-            @Field("id") String id
+            @Field("id") String id,
+            @Field("eid") String eid
 
     );
 
