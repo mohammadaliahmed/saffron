@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "471791210116",
+    "firebase_url": "https://saffronclub-b5456.firebaseio.com",
+    "project_id": "saffronclub-b5456",
+    "storage_bucket": "saffronclub-b5456.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471791210116:android:f5d1c4a4b05649cd207cd1",
+        "android_client_info": {
+          "package_name": "com.saffron.club"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "471791210116-ngr9avd0kss8s7v98v68drlg8pmgstev.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saffron.club",
+            "certificate_hash": "fa7734f56677f3ea319837d95cad6564d25b63ef"
+          }
+        },
+        {
+          "client_id": "471791210116-c6otg58aukkvj19a9p8gsf50bebpj29l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArQa5WlEJLRrUtyw58UsSjnWmX3scHU2U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "471791210116-c6otg58aukkvj19a9p8gsf50bebpj29l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
