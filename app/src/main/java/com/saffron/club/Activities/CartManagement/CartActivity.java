@@ -122,9 +122,13 @@ public class CartActivity extends AppCompatActivity {
                 startPurchasePayPal(title, Amount);
 
 
+
+
+                //your previous work
+
+
+
 //                showBottomDialog();
-
-
 //                charge.save();
 
 //                DropInRequest dropInRequest = new DropInRequest()
