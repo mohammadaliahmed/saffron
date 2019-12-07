@@ -77,6 +77,8 @@
                 <data android:scheme="${applicationId}.braintree" />
             </intent-filter>
         </activity>
+        <activity android:name=".Activities.ViewOrderDetails"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

@@ -15,6 +15,7 @@ import com.saffron.club.NetworkResponses.SaveUserResponse;
 import com.saffron.club.NetworkResponses.SignupResponse;
 import com.saffron.club.NetworkResponses.UploadProfilePictureReponse;
 import com.saffron.club.NetworkResponses.UserDetailsResponse;
+import com.saffron.club.NetworkResponses.ViewOrderResponse;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -28,6 +29,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 
 public interface UserClient {
 
@@ -78,6 +80,15 @@ public interface UserClient {
             @Header("Authorization") String auth
 
     );
+
+    @Headers({"Content-Type: application/json;charset=UTF-8"})
+    @POST("/public/api/orders/{id}")
+    Call<ViewOrderResponse> getOrdersDetails(
+            @Header("Authorization") String auth,
+            @Path(value = "id", encoded = true) String userId
+
+    );
+
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
     @POST("/public/api/savegeneral")

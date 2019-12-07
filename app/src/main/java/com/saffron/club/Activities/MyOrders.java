@@ -68,7 +68,12 @@ public class MyOrders extends AppCompatActivity {
                     ListOfOrdersResponse object = response.body();
                     if (object != null && object.getOrders() != null) {
                         if (object.getOrders().size() > 0) {
-                            itemList = object.getOrders();
+                            for (OrderModel model : object.getOrders()) {
+//                                if (model.getuId().equalsIgnoreCase("" + SharedPrefs.getUserModel().getId())) {
+                                itemList.add(model);
+                            }
+//                            }
+
                             adapter.setItemList(itemList);
                         } else {
                             CommonUtils.showToast("No products Data");

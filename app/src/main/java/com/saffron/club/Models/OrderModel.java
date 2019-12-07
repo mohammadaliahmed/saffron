@@ -3,6 +3,8 @@ package com.saffron.club.Models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class OrderModel {
     @SerializedName("id")
     @Expose
@@ -24,7 +26,7 @@ public class OrderModel {
     private Object paymentMethod;
     @SerializedName("payment_status")
     @Expose
-    private Object paymentStatus;
+    private String paymentStatus;
     @SerializedName("order_status")
     @Expose
     private String orderStatus;
@@ -46,6 +48,15 @@ public class OrderModel {
     @SerializedName("updated_at")
     @Expose
     private String updatedAt;
+
+
+    private List<DetailModel> detail = null;
+    @SerializedName("extra")
+    @Expose
+    private List<Object> extra = null;
+    @SerializedName("tables")
+    @Expose
+    private List<Table> tables = null;
 
     public Integer getId() {
         return id;
@@ -95,12 +106,36 @@ public class OrderModel {
         this.paymentMethod = paymentMethod;
     }
 
-    public Object getPaymentStatus() {
+    public String getPaymentStatus() {
         return paymentStatus;
     }
 
-    public void setPaymentStatus(Object paymentStatus) {
+    public void setPaymentStatus(String paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public List<DetailModel> getDetail() {
+        return detail;
+    }
+
+    public void setDetail(List<DetailModel> detail) {
+        this.detail = detail;
+    }
+
+    public List<Object> getExtra() {
+        return extra;
+    }
+
+    public void setExtra(List<Object> extra) {
+        this.extra = extra;
+    }
+
+    public List<Table> getTables() {
+        return tables;
+    }
+
+    public void setTables(List<Table> tables) {
+        this.tables = tables;
     }
 
     public String getOrderStatus() {

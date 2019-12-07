@@ -1,33 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_margin="10dp"
-    app:cardElevation="1dp"
-    app:cardCornerRadius="10dp"
-    android:layout_height="wrap_content">
+    app:cardCornerRadius="5dp"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardElevation="5dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+>
+
+        <TextView
+            android:id="@+id/serial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Sr)"
+            android:textColor="#000" />
 
         <TextView
             android:id="@+id/orderId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="fsdfsdfs"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="10dp"
+            android:text="sdfsdfsd"
             android:textColor="#000" />
 
-        <TextView
-            android:id="@+id/date"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/orderId"
             android:layout_alignParentRight="true"
-            android:layout_margin="10dp"
-            android:gravity="right"
-            android:textSize="12sp" />
+            android:layout_marginRight="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/productInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="10dp"
+                android:text="Products"
+                android:textColor="#000" />
+
+            <LinearLayout
+                android:id="@+id/paidViaLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+
+                    android:text="Paid via"
+                    android:textColor="#000" />
+
+                <ImageView
+                    android:id="@+id/paidVia"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/ic_stripe" />
+            </LinearLayout>
+        </LinearLayout>
+
+
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

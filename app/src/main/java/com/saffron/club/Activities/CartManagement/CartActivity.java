@@ -27,7 +27,9 @@ import com.saffron.club.Utils.AppConfig;
 import com.saffron.club.Utils.CommonUtils;
 import com.saffron.club.Utils.SharedPrefs;
 import com.saffron.club.Utils.UserClient;
+import com.stripe.android.Stripe;
 import com.stripe.android.model.Card;
+import com.stripe.android.model.Token;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -86,8 +88,11 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                showBottomDialog();
+//                showBottomDialog();
 
+                Intent send = new Intent(CartActivity.this, Pay.class);
+                send.putExtra("amount",totall);
+                startActivity(send);
 
 //                charge.save();
 
@@ -168,6 +173,7 @@ public class CartActivity extends AppCompatActivity {
             }
         });
         mNumber.addTextChangedListener(new FourDigitCardFormatWatcher());
+
 
 
         dialog.show();
@@ -262,11 +268,8 @@ public class CartActivity extends AppCompatActivity {
                 itemList.remove(positionn);
                 adapter.setItemList(itemList);
                 HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
-                if (map != null) {
-                    map.remove(Integer.parseInt(productt));
-                    SharedPrefs.setCartMenuIds(map);
-
-                }
+                map.remove(Integer.parseInt(productt));
+                SharedPrefs.setCartMenuIds(map);
                 if (itemList.size() == 0) {
                     SharedPrefs.clearCartMenuIds();
                 }
@@ -405,11 +408,7 @@ public class CartActivity extends AppCompatActivity {
     private void calculateTotal() {
         total = 0;
         for (MenuModel menuModel : itemList) {
-            double pri = Double.parseDouble(menuModel.getProduct().getPrice());
-            if (menuModel.getVariation() != null) {
-                pri = Double.parseDouble(menuModel.getVariation().getPrice());
-            }
-            total = total + (menuModel.getQuantity() * pri);
+            total = total + (menuModel.getQuantity() * Double.parseDouble(menuModel.getProduct().getPrice()));
         }
         totall = String.format("%.2f", total);
         totalAmount.setText("$" + totall);
