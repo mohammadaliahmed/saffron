@@ -1,9 +1,11 @@
 package com.saffron.club.Activities.CartManagement;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +19,11 @@ import com.braintreepayments.api.dropin.DropInActivity;
 import com.braintreepayments.api.dropin.DropInRequest;
 import com.braintreepayments.api.dropin.DropInResult;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
 import com.saffron.club.Activities.MainActivity;
 import com.saffron.club.Models.BookingModel;
 import com.saffron.club.Models.MenuModel;
@@ -32,6 +39,7 @@ import com.stripe.android.model.Card;
 import com.stripe.android.model.Token;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +49,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.json.JSONException;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -67,6 +78,16 @@ public class CartActivity extends AppCompatActivity {
     private EditText mNumber, mMonth, mYear, mCVC, mName;
     private boolean mLenNumber = false, mLenMonth = false, mLenYear = false, mLenCVC = false, mLenName = false;
 
+    //paypal
+    private static PayPalConfiguration config = new PayPalConfiguration()
+            // Start with mock environment.  When ready, switch to sandbox (ENVIRONMENT_SANDBOX)
+            // or live (ENVIRONMENT_PRODUCTION)
+            .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
+            .clientId("AWwiDoy5r3PPGaA4GEnGuJX3_iNsLiF_zYtZKkBrdNTTCvGybzCURusWuq-Q-8j_fLE454JT70Jp4yUE");
+
+    private static final int REQUEST_CODE_PAYMENT = 1;
+    PayPalPayment thingToBuy;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,11 +109,21 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                //card payment activity start here
+
+//                Intent send = new Intent(CartActivity.this, Pay.class);
+//                send.putExtra("amount",totall);
+//                startActivity(send);
+
+
+                //Paypal Payment activity start here
+                String title = "Order1";
+                BigDecimal Amount = BigDecimal.valueOf(100);
+                startPurchasePayPal(title, Amount);
+
+
 //                showBottomDialog();
 
-                Intent send = new Intent(CartActivity.this, Pay.class);
-                send.putExtra("amount",totall);
-                startActivity(send);
 
 //                charge.save();
 
@@ -175,8 +206,13 @@ public class CartActivity extends AppCompatActivity {
         mNumber.addTextChangedListener(new FourDigitCardFormatWatcher());
 
 
-
         dialog.show();
+    }
+
+    @Override
+    public void onDestroy() {
+        stopService(new Intent(this, PayPalService.class));
+        super.onDestroy();
     }
 
     private void cardDetails(BottomSheetDialog dialog) {
@@ -441,6 +477,22 @@ public class CartActivity extends AppCompatActivity {
 
     }
 
+
+    private void startPurchasePayPal(String PurchaseTitle, BigDecimal TotalAmount) {
+
+
+        thingToBuy = new PayPalPayment(TotalAmount, "USD",
+                PurchaseTitle, PayPalPayment.PAYMENT_INTENT_SALE);
+        Intent intent = new Intent(CartActivity.this,
+                PaymentActivity.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+
+        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, thingToBuy);
+
+        startActivityForResult(intent, REQUEST_CODE_PAYMENT);
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -455,6 +507,37 @@ public class CartActivity extends AppCompatActivity {
                 Exception error = (Exception) data.getSerializableExtra(DropInActivity.EXTRA_ERROR);
             }
         }
+        if (requestCode == REQUEST_CODE_PAYMENT) {
+            if (resultCode == Activity.RESULT_OK) {
+                PaymentConfirmation confirm = data
+                        .getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+                if (confirm != null) {
+                    try {
+                        System.out.println(confirm.toJSONObject().toString(4));
+                        System.out.println(confirm.getPayment().toJSONObject()
+                                .toString(4));
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //Your code here on Success case
+
+                            }
+                        });
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                System.out.println("The user canceled.");
+            } else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
+                System.out
+                        .println("An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
+            }
+        }
+
+
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.paypal.android.sdk.payments.PayPalConfiguration;
 import com.saffron.club.R;
 import com.stripe.android.ApiResultCallback;
 import com.stripe.android.Stripe;
@@ -26,11 +27,19 @@ public class Pay extends AppCompatActivity {
     private String cardNumber;
     private TextView amount;
     private CardInputWidget mCardInputWidget;
-
+    private static PayPalConfiguration config;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
+
+        config = new PayPalConfiguration()
+
+                // Start with mock environment.  When ready, switch to sandbox (ENVIRONMENT_SANDBOX)
+                // or live (ENVIRONMENT_PRODUCTION)
+                .environment(PayPalConfiguration.ENVIRONMENT_NO_NETWORK)
+
+                .clientId("AcLW5HGkgFvX5uHcqFU1QBLw-SVUAYhjlYX8c95J-vpTEdPapd1W3Jx0");
 
         mCardInputWidget = findViewById(R.id.card_input_widget);
         amount = findViewById(R.id.amount);

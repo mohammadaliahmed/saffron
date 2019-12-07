@@ -68,6 +68,7 @@
         <activity android:name=".Activities.MyProfile" />
         <activity android:name=".Activities.ReservationManagement.BookTable" />
         <activity android:name=".Activities.CartManagement.CartActivity" />
+        <activity android:name=".Activities.CartManagement.Pay" />
         <activity android:name="com.braintreepayments.api.BraintreeBrowserSwitchActivity"
             android:launchMode="singleTask">
             <intent-filter>
