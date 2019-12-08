@@ -117,6 +117,7 @@ public class CartActivity extends AppCompatActivity {
 
 
                 //Paypal Payment activity start here
+
                 String title = "Order1";
                 BigDecimal Amount = BigDecimal.valueOf(100);
                 startPurchasePayPal(title, Amount);
