@@ -540,8 +540,6 @@ public class CartActivity extends AppCompatActivity {
                         .println("An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
             }
         }
-
-
     }
 
     @Override
