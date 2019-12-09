@@ -77,5 +77,15 @@ public class BookTable extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        int item = pager.getCurrentItem();
+        if (item > 0) {
+            item--;
+            pager.setCurrentItem(item);
+        }else{
+            finish();
+        }
+    }
 }

@@ -32,6 +32,7 @@ import com.saffron.club.Models.BookingModel;
 import com.saffron.club.Models.MenuModel;
 import com.saffron.club.Models.PaypalResponse;
 import com.saffron.club.NetworkResponses.ConfirmBookingResponse;
+import com.saffron.club.NetworkResponses.PlaceOrderResponse;
 import com.saffron.club.NetworkResponses.RemoveMenuResponse;
 import com.saffron.club.R;
 import com.saffron.club.Utils.AppConfig;
@@ -114,32 +115,12 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                //card payment activity start here
 
-//                Intent send = new Intent(CartActivity.this, Pay.class);
-//                send.putExtra("amount",totall);
-//                startActivity(send);
+//                String title = "Saffron CLub";
+//                BigDecimal Amount = BigDecimal.valueOf(total);
+//                startPurchasePayPal(title, Amount);
 
-
-                //Paypal Payment activity start here
-
-                String title = "Saffron CLub";
-                BigDecimal Amount = BigDecimal.valueOf(total);
-                startPurchasePayPal(title, Amount);
-
-
-                //your previous work
-
-
-//                showBottomDialog();
-//                charge.save();
-
-//                DropInRequest dropInRequest = new DropInRequest()
-//                        .clientToken(clientToken);
-//                startActivityForResult(dropInRequest.getIntent(CartActivity.this), REQUEST_CODE);
-//                DropInRequest dropInRequest = new DropInRequest()
-//                        .clientToken(clientToken);
-//                startActivityForResult(dropInRequest.getIntent(CartActivity.this), REQUEST_CODE);
+                placeOrderNow();
 
 
             }
@@ -185,6 +166,26 @@ public class CartActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         getCartDataFromServer();
 
+    }
+
+    private void placeOrderNow() {
+
+        UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
+        Call<PlaceOrderResponse> call = getResponse.placeOrder(
+                SharedPrefs.getToken(),
+                "" + tableList
+        );
+        call.enqueue(new Callback<PlaceOrderResponse>() {
+            @Override
+            public void onResponse(Call<PlaceOrderResponse> call, Response<PlaceOrderResponse> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<PlaceOrderResponse> call, Throwable t) {
+
+            }
+        });
     }
 
     private void showBottomDialog() {

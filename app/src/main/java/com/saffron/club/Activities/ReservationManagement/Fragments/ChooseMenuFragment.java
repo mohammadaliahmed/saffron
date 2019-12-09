@@ -268,6 +268,7 @@ public class ChooseMenuFragment extends Fragment {
     }
 
     private void addToCartProduct(final Product product, int edi, final Dialog dialog) {
+        dialog.dismiss();
         wholeLayout.setVisibility(View.VISIBLE);
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
         Call<AddToCartResponse> call = getResponse.addToCart(
@@ -282,6 +283,7 @@ public class ChooseMenuFragment extends Fragment {
                     if (object != null) {
                         if (object.getMeta().getMessage().equalsIgnoreCase("Successfully Added")) {
                             dialog.dismiss();
+                            confirmBooking.setVisibility(View.VISIBLE);
                             CommonUtils.showToast(object.getMeta().getMessage());
                             HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
                             if (map != null) {

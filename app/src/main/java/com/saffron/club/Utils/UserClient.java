@@ -1,6 +1,9 @@
 package com.saffron.club.Utils;
 
 
+import com.saffron.club.Models.BookingModel;
+import com.saffron.club.Models.MenuModel;
+import com.saffron.club.Models.Table;
 import com.saffron.club.NetworkResponses.AddToCartResponse;
 import com.saffron.club.NetworkResponses.CategoryResponse;
 import com.saffron.club.NetworkResponses.ChangePasswordResponse;
@@ -8,6 +11,7 @@ import com.saffron.club.NetworkResponses.ConfirmBookingResponse;
 import com.saffron.club.NetworkResponses.LoginResponse;
 import com.saffron.club.NetworkResponses.ListOfOrdersResponse;
 import com.saffron.club.NetworkResponses.MakeReservationResponse;
+import com.saffron.club.NetworkResponses.PlaceOrderResponse;
 import com.saffron.club.NetworkResponses.ProductResponse;
 import com.saffron.club.NetworkResponses.RemoveMenuResponse;
 import com.saffron.club.NetworkResponses.SaveAddressResponse;
@@ -16,6 +20,9 @@ import com.saffron.club.NetworkResponses.SignupResponse;
 import com.saffron.club.NetworkResponses.UploadProfilePictureReponse;
 import com.saffron.club.NetworkResponses.UserDetailsResponse;
 import com.saffron.club.NetworkResponses.ViewOrderResponse;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -211,6 +218,15 @@ public interface UserClient {
     Call<RemoveMenuResponse> removeTable(
             @Header("Authorization") String auth,
             @Field("id") String id
+
+    );
+
+    @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
+    @POST("/web/api/placeorder")
+    @FormUrlEncoded
+    Call<PlaceOrderResponse> placeOrder(
+            @Header("Authorization") String auth,
+            @Field("menu") String id
 
     );
 
