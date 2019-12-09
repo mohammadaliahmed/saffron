@@ -19,6 +19,9 @@ import com.braintreepayments.api.dropin.DropInActivity;
 import com.braintreepayments.api.dropin.DropInRequest;
 import com.braintreepayments.api.dropin.DropInResult;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.paypal.android.sdk.payments.PayPalConfiguration;
 import com.paypal.android.sdk.payments.PayPalPayment;
 import com.paypal.android.sdk.payments.PayPalService;
@@ -27,6 +30,7 @@ import com.paypal.android.sdk.payments.PaymentConfirmation;
 import com.saffron.club.Activities.MainActivity;
 import com.saffron.club.Models.BookingModel;
 import com.saffron.club.Models.MenuModel;
+import com.saffron.club.Models.PaypalResponse;
 import com.saffron.club.NetworkResponses.ConfirmBookingResponse;
 import com.saffron.club.NetworkResponses.RemoveMenuResponse;
 import com.saffron.club.R;
@@ -51,6 +55,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -118,15 +123,12 @@ public class CartActivity extends AppCompatActivity {
 
                 //Paypal Payment activity start here
 
-                String title = "Order1";
-                BigDecimal Amount = BigDecimal.valueOf(100);
+                String title = "Saffron CLub";
+                BigDecimal Amount = BigDecimal.valueOf(total);
                 startPurchasePayPal(title, Amount);
 
 
-
-
                 //your previous work
-
 
 
 //                showBottomDialog();
@@ -521,6 +523,15 @@ public class CartActivity extends AppCompatActivity {
                         System.out.println(confirm.toJSONObject().toString(4));
                         System.out.println(confirm.getPayment().toJSONObject()
                                 .toString(4));
+                        JsonParser parser = new JsonParser();
+                        JsonElement mJson = parser.parse(confirm.toJSONObject().toString());
+                        Gson gson = new Gson();
+                        PaypalResponse object = gson.fromJson(mJson, PaypalResponse.class);
+//                        CommonUtils.showToast(object.getResponse().getState());
+                        if (object.getResponse().getState().equalsIgnoreCase("approved")) {
+                            CommonUtils.showToast("Payment successfull");
+                            finish();
+                        }
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
