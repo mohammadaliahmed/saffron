@@ -34,7 +34,7 @@ import retrofit2.http.Path;
 public interface UserClient {
 
 
-    @POST("/public/api/login")
+    @POST("/web/api/login")
     @FormUrlEncoded
     Call<LoginResponse> loginUser(
             @Field("email") String email,
@@ -42,7 +42,7 @@ public interface UserClient {
 
     );
 
-    @POST("/public/api/signup")
+    @POST("/web/api/signup")
     @FormUrlEncoded
     Call<SignupResponse> signUp(
             @Field("name") String name,
@@ -54,35 +54,35 @@ public interface UserClient {
 
 
     @Headers({"Content-Type: application/json;charset=UTF-8"})
-    @POST("/public/api/details")
+    @POST("/web/api/details")
     Call<UserDetailsResponse> userDetails(
             @Header("Authorization") String auth
 
     );
 
     @Headers({"Content-Type: application/json;charset=UTF-8"})
-    @POST("/public/api/category")
+    @POST("/web/api/category")
     Call<CategoryResponse> getCategories(
             @Header("Authorization") String auth
 
     );
 
     @Headers({"Content-Type: application/json;charset=UTF-8"})
-    @POST("/public/api/products")
+    @POST("/web/api/products")
     Call<ProductResponse> getProducts(
             @Header("Authorization") String auth
 
     );
 
     @Headers({"Content-Type: application/json;charset=UTF-8"})
-    @POST("/public/api/orders/all")
+    @POST("/web/api/orders/all")
     Call<ListOfOrdersResponse> getOrders(
             @Header("Authorization") String auth
 
     );
 
     @Headers({"Content-Type: application/json;charset=UTF-8"})
-    @POST("/public/api/orders/{id}")
+    @POST("/web/api/orders/{id}")
     Call<ViewOrderResponse> getOrdersDetails(
             @Header("Authorization") String auth,
             @Path(value = "id", encoded = true) String userId
@@ -91,7 +91,7 @@ public interface UserClient {
 
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/public/api/savegeneral")
+    @POST("/web/api/savegeneral")
     @FormUrlEncoded
     Call<SaveUserResponse> saveGeneral(
             @Header("Authorization") String auth,
@@ -104,7 +104,7 @@ public interface UserClient {
     );
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/public/api/savepassword")
+    @POST("/web/api/savepassword")
     @FormUrlEncoded
     Call<ChangePasswordResponse> changePassword(
             @Header("Authorization") String auth,
@@ -115,7 +115,7 @@ public interface UserClient {
     );
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/public/api/saveaddress")
+    @POST("/web/api/saveaddress")
     @FormUrlEncoded
     Call<SaveAddressResponse> saveAddress(
             @Header("Authorization") String auth,
@@ -127,7 +127,7 @@ public interface UserClient {
     );
 
     @Headers({"Accept:application/json"})
-    @POST("/public/api/saveimage")
+    @POST("/web/api/saveimage")
     @Multipart
     Call<UploadProfilePictureReponse> uploadPicture(
             @Header("Authorization") String auth,
@@ -137,7 +137,7 @@ public interface UserClient {
 
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/public/api/reservations")
+    @POST("/web/api/reservations")
     @FormUrlEncoded
     Call<MakeReservationResponse> bookTable(
             @Header("Authorization") String auth,
@@ -149,7 +149,7 @@ public interface UserClient {
     );
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/public/api/confirm")
+    @POST("/web/api/confirm")
     Call<ConfirmBookingResponse> confirmBooking(
             @Header("Authorization") String auth
 
@@ -158,14 +158,14 @@ public interface UserClient {
 
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/public/api/confirm")
+    @POST("/web/api/confirm")
     Call<ConfirmBookingResponse> addMenuToCart(
             @Header("Authorization") String auth,
             @Field("id") String menuId
 
     );
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/public/api/addtable")
+    @POST("/web/api/addtable")
     @FormUrlEncoded
     Call<ConfirmBookingResponse> chooseTable(
             @Header("Authorization") String auth,
@@ -177,7 +177,7 @@ public interface UserClient {
     );
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/public/api/cart")
+    @POST("/web/api/cart")
     @FormUrlEncoded
     Call<ConfirmBookingResponse> confirmBooking(
             @Header("Authorization") String auth,
@@ -187,7 +187,7 @@ public interface UserClient {
     );
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/public/api/cart")
+    @POST("/web/api/cart")
     @FormUrlEncoded
     Call<AddToCartResponse> addToCart(
             @Header("Authorization") String auth,
@@ -197,7 +197,7 @@ public interface UserClient {
     );
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/public/api/removemenu")
+    @POST("/web/api/removemenu")
     @FormUrlEncoded
     Call<RemoveMenuResponse> removeMenu(
             @Header("Authorization") String auth,
@@ -206,7 +206,7 @@ public interface UserClient {
     );
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/public/api/removetable")
+    @POST("/web/api/removetable")
     @FormUrlEncoded
     Call<RemoveMenuResponse> removeTable(
             @Header("Authorization") String auth,
