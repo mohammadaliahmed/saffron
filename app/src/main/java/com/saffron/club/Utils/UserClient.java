@@ -1,6 +1,7 @@
 package com.saffron.club.Utils;
 
 
+import com.google.gson.JsonObject;
 import com.saffron.club.Models.BookingModel;
 import com.saffron.club.Models.MenuModel;
 import com.saffron.club.Models.Table;
@@ -28,6 +29,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -37,6 +39,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Url;
 
 public interface UserClient {
 
@@ -171,6 +174,7 @@ public interface UserClient {
             @Field("id") String menuId
 
     );
+
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
     @POST("/web/api/addtable")
     @FormUrlEncoded
@@ -221,12 +225,28 @@ public interface UserClient {
 
     );
 
+    //    @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
+//    @POST("/web/api/placeorder{data}")
+//    Call<PlaceOrderResponse> placeOrder(
+//            @Header("Authorization") String auth,
+//            @Path(value = "data", encoded = true) String data,
+//            @Url String apiname
+//
+//
+//    );
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
-    @POST("/web/api/placeorder")
-    @FormUrlEncoded
+    @POST()
     Call<PlaceOrderResponse> placeOrder(
             @Header("Authorization") String auth,
-            @Field("menu") String id
+            @Url String apiname
+
+
+    );
+
+    @POST("/braintreeCheckout.php")
+    @FormUrlEncoded
+    Call<ResponseBody> braintreeCheckout(
+            @Field("payment_method_nonce") String nonce
 
     );
 

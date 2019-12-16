@@ -62,7 +62,7 @@ public class ExtrasProductAdapter extends RecyclerView.Adapter<ExtrasProductAdap
         }
 
         holder.title.setText(product.getName());
-        Glide.with(context).load(AppConfig.BASE_URL + "storage/app/" + product.getImage()).into(holder.image);
+        Glide.with(context).load(AppConfig.BASE_URL_Image+ product.getImage()).into(holder.image);
         holder.price.setText("$ " + product.getPrice());
         final boolean finalCanAdd = canAdd;
         holder.addToCart.setOnClickListener(new View.OnClickListener() {

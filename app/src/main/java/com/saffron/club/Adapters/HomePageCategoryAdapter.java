@@ -46,7 +46,7 @@ public class HomePageCategoryAdapter extends RecyclerView.Adapter<HomePageCatego
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Category category = itemList.get(position);
         holder.title.setText(category.getName());
-        Glide.with(context).load(AppConfig.BASE_URL + "storage/app/" + category.getImage()).into(holder.image);
+        Glide.with(context).load(AppConfig.BASE_URL_Image + category.getImage()).into(holder.image);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

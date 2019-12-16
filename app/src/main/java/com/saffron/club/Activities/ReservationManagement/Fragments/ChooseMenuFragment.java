@@ -196,7 +196,7 @@ public class ChooseMenuFragment extends Fragment {
         RecyclerView extrasRecycler = layout.findViewById(R.id.extrasRecycler);
 
         title.setText(product.getName());
-        Glide.with(context).load(AppConfig.BASE_URL + "storage/app/" + product.getImage()).into(picture);
+        Glide.with(context).load(AppConfig.BASE_URL_Image + product.getImage()).into(picture);
 
         if (product.getExtras() != null && product.getExtras().size() > 0) {
             variationLayout.setVisibility(View.VISIBLE);

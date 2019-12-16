@@ -46,6 +46,36 @@ public class UserModel {
     @Expose
     private String updatedAt;
 
+    String googleAddress;
+
+
+
+    double lat,lon;
+
+    public String getGoogleAddress() {
+        return googleAddress;
+    }
+
+    public void setGoogleAddress(String googleAddress) {
+        this.googleAddress = googleAddress;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLon() {
+        return lon;
+    }
+
+    public void setLon(double lon) {
+        this.lon = lon;
+    }
+
     public String getName() {
         return name;
     }

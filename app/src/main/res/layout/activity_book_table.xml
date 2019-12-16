@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="32dp"
+        app:stpi_stepCount="3"
         android:layout_marginRight="16dp"
         app:stpi_labels="@array/stepLabels" />
 

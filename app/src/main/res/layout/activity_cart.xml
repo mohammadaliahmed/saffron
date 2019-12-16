@@ -82,6 +82,106 @@
                 </androidx.recyclerview.widget.RecyclerView>
             </RelativeLayout>
 
+            <LinearLayout
+                android:id="@+id/deliverySection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="10dp"
+                    android:fontFamily="@font/montez"
+                    android:text="Delivery Type"
+                    android:textColor="@color/colorSaffron"
+                    android:textSize="30sp" />
+
+                <RadioGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/pickUp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:checked="true"
+                        android:text="Pick Up" />
+
+                    <RadioButton
+                        android:id="@+id/homeDelivery"
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:text="Home Delivery" />
+                </RadioGroup>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/black_corners"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:layout_margin="10dp"
+                        android:src="@drawable/ic_location" />
+
+                    <TextView
+                        android:id="@+id/chooseLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="Choose Delivery Location"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/distance"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:background="@drawable/black_corners"
+                        android:gravity="center"
+                        android:text="Distance: 0m" />
+
+                    <TextView
+                        android:id="@+id/cost"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+
+                        android:background="@drawable/black_corners"
+                        android:gravity="center"
+                        android:text="Cost: $0" />
+
+                </LinearLayout>
+
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
@@ -123,5 +223,18 @@
 
     </LinearLayout>
 
+    <RelativeLayout
+        android:id="@+id/wholeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.8"
+        android:background="#fff"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
 
 </RelativeLayout>

@@ -27,6 +27,7 @@ import com.saffron.club.R;
 import com.saffron.club.Utils.AppConfig;
 import com.saffron.club.Utils.CommonUtils;
 import com.saffron.club.Utils.CompressImage;
+import com.saffron.club.Utils.Glide4Engine;
 import com.saffron.club.Utils.SharedPrefs;
 import com.saffron.club.Utils.UserClient;
 import com.zhihu.matisse.Matisse;
@@ -212,7 +213,7 @@ public class MyProfile extends AppCompatActivity {
                 .maxSelectable(1)
                 .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
                 .thumbnailScale(0.85f)
-                .imageEngine(new GlideEngine())
+                .imageEngine(new Glide4Engine())
                 .forResult(23);
     }
 

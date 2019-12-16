@@ -2,6 +2,7 @@ package com.saffron.club.Activities;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -20,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.saffron.club.Activities.Callbacks.AddToCartCallback;
 import com.saffron.club.Activities.CartManagement.CartActivity;
 import com.saffron.club.Adapters.ExtrasProductAdapter;
@@ -40,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -116,6 +119,7 @@ public class ListOfProducts extends AppCompatActivity {
     private void showExtrasAlert(final Product product) {
         final Dialog dialog = new Dialog(this);
         final int[] eid = {0};
+        final ArrayList<Integer> list = new ArrayList<>();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -139,7 +143,7 @@ public class ListOfProducts extends AppCompatActivity {
         RecyclerView extrasRecycler = layout.findViewById(R.id.extrasRecycler);
 
         title.setText(product.getName());
-        Glide.with(this).load(AppConfig.BASE_URL + "storage/app/" + product.getImage()).into(picture);
+        Glide.with(this).load(AppConfig.BASE_URL_Image + product.getImage()).into(picture);
 
         if (product.getExtras() != null && product.getExtras().size() > 0) {
             variationLayout.setVisibility(View.VISIBLE);
@@ -147,7 +151,9 @@ public class ListOfProducts extends AppCompatActivity {
                 @Override
                 public void onSelect(Extra extra) {
                     eid[0] = extra.getId();
-                    CommonUtils.showToast(extra.getName());
+//                    list.add(extra.getId());
+                        showAddToCartAlert(product,eid[0],dialog);
+//                    CommonUtils.showToast(extra.getName());
                 }
             });
             variation.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
@@ -165,11 +171,16 @@ public class ListOfProducts extends AppCompatActivity {
         addToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.dismiss();
                 if (product.getExtras() != null && product.getExtras().size() > 0) {
                     if (eid[0] == 0) {
                         CommonUtils.showToast("Please select your meal size");
                     } else {
-                        addToCartProduct(product, eid[0], dialog);
+                        for (Integer abc : list) {
+                            addToCartProduct(product, abc, dialog);
+
+                        }
+//                        addToCartProduct(product, eid[0], dialog);
 
                     }
                 } else {
@@ -180,6 +191,28 @@ public class ListOfProducts extends AppCompatActivity {
 
 
         dialog.show();
+
+    }
+
+    private void showAddToCartAlert(final Product product, final int aaaaaa, final Dialog dialog) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListOfProducts.this);
+        builder.setTitle("Alert");
+        builder.setMessage("Add to cart? ");
+
+        // add the buttons
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                addToCartProduct(product, aaaaaa, dialog);
+
+
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+
+        // create and show the alert dialog
+        AlertDialog dialog1 = builder.create();
+        dialog1.show();
 
     }
 

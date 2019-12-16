@@ -5,13 +5,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,8 +22,10 @@ import com.braintreepayments.api.dropin.DropInActivity;
 import com.braintreepayments.api.dropin.DropInRequest;
 import com.braintreepayments.api.dropin.DropInResult;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.paypal.android.sdk.payments.PayPalConfiguration;
 import com.paypal.android.sdk.payments.PayPalPayment;
@@ -28,6 +33,7 @@ import com.paypal.android.sdk.payments.PayPalService;
 import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
 import com.saffron.club.Activities.MainActivity;
+import com.saffron.club.Activities.MapsActivity;
 import com.saffron.club.Models.BookingModel;
 import com.saffron.club.Models.MenuModel;
 import com.saffron.club.Models.PaypalResponse;
@@ -39,24 +45,21 @@ import com.saffron.club.Utils.AppConfig;
 import com.saffron.club.Utils.CommonUtils;
 import com.saffron.club.Utils.SharedPrefs;
 import com.saffron.club.Utils.UserClient;
-import com.stripe.android.Stripe;
 import com.stripe.android.model.Card;
-import com.stripe.android.model.Token;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -83,6 +86,9 @@ public class CartActivity extends AppCompatActivity {
 
     private EditText mNumber, mMonth, mYear, mCVC, mName;
     private boolean mLenNumber = false, mLenMonth = false, mLenYear = false, mLenCVC = false, mLenName = false;
+    TextView chooseLocation, distance, cost;
+    RadioButton homeDelivery, pickUp;
+
 
     //paypal
     private static PayPalConfiguration config = new PayPalConfiguration()
@@ -93,6 +99,14 @@ public class CartActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_PAYMENT = 1;
     PayPalPayment thingToBuy;
+
+    private double lat, lon;
+    private String returnString;
+    private double distn = 0;
+
+    RelativeLayout wholeLayout;
+    LinearLayout deliverySection;
+    String deliveryType;
 
 
     @Override
@@ -105,22 +119,61 @@ public class CartActivity extends AppCompatActivity {
             getSupportActionBar().setElevation(0);
         }
         this.setTitle("Cart");
+        homeDelivery = findViewById(R.id.homeDelivery);
+        pickUp = findViewById(R.id.pickUp);
         placeOrder = findViewById(R.id.placeOrder);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerTable = findViewById(R.id.recyclerTable);
         totalAmount = findViewById(R.id.totalAmount);
+        chooseLocation = findViewById(R.id.chooseLocation);
+        wholeLayout = findViewById(R.id.wholeLayout);
+        cost = findViewById(R.id.cost);
+        deliverySection = findViewById(R.id.deliverySection);
+        distance = findViewById(R.id.distance);
+
+
+        deliveryType = "Pick Up";
+
+        homeDelivery.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                deliveryType = "Home Delivery";
+            }
+        });
+        pickUp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                deliveryType = "Pick Up";
+            }
+        });
+
+        chooseLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(CartActivity.this, MapsActivity.class);
+                startActivityForResult(i, 1);
+            }
+        });
 
         getTokenFromServer();
         placeOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+//                DropInRequest dropInRequest = new DropInRequest()
+//                        .clientToken(clientToken);
+//                startActivityForResult(dropInRequest.getIntent(CartActivity.this), REQUEST_CODE);
+//                placeOrderNow();
 
-//                String title = "Saffron CLub";
-//                BigDecimal Amount = BigDecimal.valueOf(total);
-//                startPurchasePayPal(title, Amount);
-
-                placeOrderNow();
+                String title = "Saffron CLub";
+                BigDecimal Amount = BigDecimal.valueOf(total);
+                startPurchasePayPal(title, Amount);
+//                if (returnString == null) {
+//                    CommonUtils.showToast("Please select delivery location");
+//                } else {
+//
+//                    placeOrderNow();
+//                }
 
 
             }
@@ -169,24 +222,90 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void placeOrderNow() {
+        wholeLayout.setVisibility(View.VISIBLE);
+
+        HashMap<String, Object> finalMap = new HashMap<>();
+
+        finalMap.put("table", tableList);
+        finalMap.put("menu", itemList);
+        finalMap.put("totalPrice", total);
+        finalMap.put("time", System.currentTimeMillis());
+        finalMap.put("deliveryLat", lat);
+        finalMap.put("deliveryLon", lon);
+        finalMap.put("distance", distn);
+        finalMap.put("cost", distn);
+
+
+        Gson gson = new Gson();
+        String abc = gson.toJson(finalMap);
+        JsonObject map = new JsonObject();
+
+        map.addProperty("order", abc);
+
+        String finalUrl = "";
+        String abadac = String.format("%.2f", total);
+
+        finalUrl = finalUrl + "/web/api/placeorder?cooking_time=30&cost=" + (int) distn + "&totalPrice=" + abadac;
+        int count = 0;
+
+        for (BookingModel model : tableList) {
+            String tab = "";
+            tab = tab + "&t_id[" + count + "]=" + model.gettId();
+            tab = tab + "&persons[" + count + "]=" + model.getPersons();
+            tab = tab + "&time[" + count + "]=" + model.getTime();
+            tab = tab + "&date[" + count + "]=" + model.getDate();
+
+            count++;
+            finalUrl = finalUrl + tab;
+        }
+        count = 0;
+        for (MenuModel model : itemList) {
+            String menu = "";
+            menu = menu + "&product[" + count + "]=" + model.getProduct().getId();
+            if (model.getProduct().getExtras() != null) {
+                menu = menu + "&extra[" + count + "]=" + model.getProduct().getExtras().get(0).getId();
+            }
+            menu = menu + "&quantity[" + count + "]=" + model.getQuantity();
+            count++;
+            finalUrl = finalUrl + menu;
+        }
+        finalUrl=finalUrl+"&delivery_type="+deliveryType;
+        count = 0;
+
 
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
         Call<PlaceOrderResponse> call = getResponse.placeOrder(
                 SharedPrefs.getToken(),
-                "" + tableList
+                finalUrl
         );
         call.enqueue(new Callback<PlaceOrderResponse>() {
             @Override
             public void onResponse(Call<PlaceOrderResponse> call, Response<PlaceOrderResponse> response) {
-
+                wholeLayout.setVisibility(View.GONE);
+                if (response.code() == 200) {
+                    if (response.body().getMeta().getMessage().equalsIgnoreCase("Order Placed ")) {
+                        CommonUtils.showToast("Order Placed Succesffuly");
+                        SharedPrefs.clearCartMenuIds();
+                        Intent i = new Intent(CartActivity.this, MainActivity.class);
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(i);
+                        finish();
+                    } else {
+                        CommonUtils.showToast(response.body().getMeta().getMessage());
+                    }
+                } else {
+                    CommonUtils.showToast("There is some error");
+                }
             }
 
             @Override
             public void onFailure(Call<PlaceOrderResponse> call, Throwable t) {
-
+                CommonUtils.showToast(t.getMessage());
+                wholeLayout.setVisibility(View.GONE);
             }
         });
     }
+
 
     private void showBottomDialog() {
         final BottomSheetDialog dialog = new BottomSheetDialog(CartActivity.this);
@@ -423,6 +542,12 @@ public class CartActivity extends AppCompatActivity {
                         itemList.clear();
                         tableList.clear();
                         tableList = confirmBookingResponse.getConfirmBookingModel().getBookings();
+                        if (tableList.size() > 0) {
+                            deliverySection.setVisibility(View.GONE);
+                        } else {
+                            deliverySection.setVisibility(View.VISIBLE);
+
+                        }
                         for (MenuModel menuModel : confirmBookingResponse.getConfirmBookingModel().getMenu()) {
                             if (menuModel.getProduct() != null) {
                                 menuModel.setQuantity(1);
@@ -454,6 +579,7 @@ public class CartActivity extends AppCompatActivity {
         for (MenuModel menuModel : itemList) {
             total = total + (menuModel.getQuantity() * Double.parseDouble(menuModel.getProduct().getPrice()));
         }
+        total = total + distn;
         totall = String.format("%.2f", total);
         totalAmount.setText("$" + totall);
     }
@@ -485,6 +611,26 @@ public class CartActivity extends AppCompatActivity {
 
     }
 
+    private void postNonceToServer(String nonce) {
+        UserClient getResponse = AppConfig.getTokenUrl().create(UserClient.class);
+        Call<ResponseBody> call = getResponse.braintreeCheckout(
+                nonce
+        );
+        call.enqueue(new Callback<ResponseBody>() {
+
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
+    }
+
 
     private void startPurchasePayPal(String PurchaseTitle, BigDecimal TotalAmount) {
 
@@ -504,9 +650,31 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            if (data != null) {
+                returnString = data.getStringExtra("address");
+                lat = data.getDoubleExtra("lat", 0.0);
+                lon = data.getDoubleExtra("lon", 0.0);
+
+                chooseLocation.setText("Delivery: " + returnString);
+
+                distn = CommonUtils.distance(lat, lon, -34.877180, 138.601850);
+                distance.setText("Distance: " + String.format("%.2f", distn) + "m");
+                cost.setText("Cost: $" + String.format("%.2f", distn * 1));
+                calculateTotal();
+
+
+            }
+        }
         if (requestCode == REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 DropInResult result = data.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
+                if (result != null) {
+                    String paymentNonce = result.getPaymentMethodNonce().getNonce();
+                    if (paymentNonce != null) {
+                        postNonceToServer(paymentNonce);
+                    }
+                }
                 // use the result to update your UI and send the payment method nonce to your server
             } else if (resultCode == RESULT_CANCELED) {
                 // the user canceled
@@ -531,7 +699,8 @@ public class CartActivity extends AppCompatActivity {
 //                        CommonUtils.showToast(object.getResponse().getState());
                         if (object.getResponse().getState().equalsIgnoreCase("approved")) {
                             CommonUtils.showToast("Payment successfull");
-                            finish();
+                            placeOrderNow();
+//                            finish();
                         }
                         runOnUiThread(new Runnable() {
                             @Override
@@ -554,6 +723,7 @@ public class CartActivity extends AppCompatActivity {
             }
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

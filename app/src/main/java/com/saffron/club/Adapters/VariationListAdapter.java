@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class VariationListAdapter extends RecyclerView.Adapter<VariationListAdapter.ViewHolder> {
     Context context;
     List<Extra> itemList = new ArrayList<>();
-    int selected = -1;
+    List<Integer> selectedList = new ArrayList<>();
 
     ExtrasCallback callback;
 
@@ -45,7 +45,7 @@ public class VariationListAdapter extends RecyclerView.Adapter<VariationListAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         final Extra extra = itemList.get(position);
-        if (selected == position) {
+        if (selectedList.contains(position)) {
             holder.layout.setBackground(context.getResources().getDrawable(R.drawable.red_corners_bold));
         } else {
             holder.layout.setBackground(context.getResources().getDrawable(R.drawable.grey_corners));
@@ -58,7 +58,8 @@ public class VariationListAdapter extends RecyclerView.Adapter<VariationListAdap
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selected = position;
+//                selected = position;
+                selectedList.add(position);
                 callback.onSelect(extra);
                 notifyDataSetChanged();
             }

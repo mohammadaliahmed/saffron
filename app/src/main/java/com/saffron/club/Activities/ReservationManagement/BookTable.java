@@ -46,6 +46,7 @@ public class BookTable extends AppCompatActivity {
         final StepperIndicator indicator = findViewById(R.id.stepper_indicator);
         // We keep last page for a "finishing" page
         indicator.setViewPager(pager, true);
+        indicator.setStepCount(3);
 
         indicator.addOnStepClickListener(new StepperIndicator.OnStepClickListener() {
             @Override

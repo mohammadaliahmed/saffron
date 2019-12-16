@@ -50,7 +50,7 @@ public class CartMenuAdapter extends RecyclerView.Adapter<CartMenuAdapter.ViewHo
         holder.title.setText(menuModel.getProduct().getName());
         holder.price.setText("$" + menuModel.getProduct().getPrice());
 
-        Glide.with(context).load(AppConfig.BASE_URL + "storage/app/" + menuModel.getProduct().getImage()).into(holder.image);
+        Glide.with(context).load(AppConfig.BASE_URL_Image  + menuModel.getProduct().getImage()).into(holder.image);
 
         if (menuModel.getVariation() != null) {
             holder.subtitle.setText("Option: " + menuModel.getVariation().getName());

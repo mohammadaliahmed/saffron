@@ -110,13 +110,14 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
                 if (response.isSuccessful()) {
+                    itemList.clear();
                     CategoryResponse object = response.body();
                     if (object != null && object.getData() != null) {
                         if (object.getData().size() > 0) {
                             for (Category category : object.getData()) {
                                 if (!category.getName().equalsIgnoreCase("Additional Items")) {
                                     itemList.add(category);
-                                }else{
+                                } else {
 
                                 }
                             }
@@ -137,6 +138,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
     private void getProductsDataFromDB() {
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
         Call<ProductResponse> call = getResponse.getProducts(

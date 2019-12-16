@@ -17,5 +17,6 @@
         <item>Choose Table</item>
         <item>Choose Menu</item>
     </string-array>
+    <string name="title_activity_maps">Map</string>
 
 </resources>

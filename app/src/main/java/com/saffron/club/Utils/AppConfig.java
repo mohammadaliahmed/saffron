@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AppConfig {
     public static String BASE_URL = "https://saffronclub.com.au/";
-    public static String BASE_URL_Image = "https://saffronclub.com.au/storage/app/";
+    public static String BASE_URL_Image = "http://saffronclub.com.au/web/core/storage/app/";
     public static String TOKKEN = "http://acnure.com/";
 
     public static Retrofit getRetrofit() {
