@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="120dp"
     android:layout_margin="10dp"
-    android:background="@drawable/red_corners">
+    android:background="@drawable/white_corners">
 
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -22,7 +22,7 @@
         android:layout_marginLeft="120dp"
         android:layout_marginTop="5dp"
         android:lines="1"
-        android:textColor="#000"
+        android:textColor="#fff"
         android:textSize="20sp" />
 
     <TextView
@@ -31,6 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/title"
         android:layout_gravity="center"
+        android:textColor="#fff"
         android:layout_marginLeft="120dp"
         android:layout_marginRight="10dp"
         android:lines="3"
@@ -43,7 +44,7 @@
         android:layout_marginTop="80dp"
         android:layout_marginRight="20dp"
         android:layout_toLeftOf="@id/addToCart"
-        android:textColor="@color/colorSaffron"
+        android:textColor="@color/colorWhite"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -54,7 +55,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginTop="80dp"
         android:layout_marginRight="10dp"
-        android:background="@drawable/btn_bg"
+        android:background="@drawable/btn_bg_green"
 
         android:inputType="text"
         android:text="Add"

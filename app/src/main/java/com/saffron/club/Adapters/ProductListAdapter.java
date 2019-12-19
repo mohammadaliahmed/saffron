@@ -91,7 +91,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             canAdd = false;
         } else {
             holder.addToCart.setText("Add");
-            holder.addToCart.setBackground(context.getResources().getDrawable(R.drawable.btn_bg));
+            holder.addToCart.setBackground(context.getResources().getDrawable(R.drawable.btn_bg_green));
             holder.addToCart.setTextColor(context.getResources().getColor(R.color.colorWhite));
 
 
@@ -109,6 +109,9 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
 //                CommonUtils.showToast("Add to cart");
                 if (finalCanAdd) {
                     cartCallback.onAddToCart(product);
+                }else{
+                    cartCallback.onRemoveFromCart(product);
+
                 }
             }
         });

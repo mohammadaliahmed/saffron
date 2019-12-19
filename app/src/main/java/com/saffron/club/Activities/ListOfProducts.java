@@ -109,11 +109,35 @@ public class ListOfProducts extends AppCompatActivity {
             @Override
             public void onAddToCart(Product product) {
                 showExtrasAlert(product);
-//                addToCartProduct(product);
+            }
+
+            @Override
+            public void onRemoveFromCart(Product product) {
+                showRemoveAlert(product);
             }
         });
         recyclerView.setAdapter(adapter);
         getProductsDataFromDB();
+    }
+
+    private void showRemoveAlert(final Product product1) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListOfProducts.this);
+        builder.setTitle("Alert");
+        builder.setMessage("Do you want to delete this food item? ");
+
+        // add the buttons
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                removeFromCartProduct(product1);
+
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+
+        // create and show the alert dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void showExtrasAlert(final Product product) {
@@ -152,7 +176,7 @@ public class ListOfProducts extends AppCompatActivity {
                 public void onSelect(Extra extra) {
                     eid[0] = extra.getId();
 //                    list.add(extra.getId());
-                        showAddToCartAlert(product,eid[0],dialog);
+                    showAddToCartAlert(product, eid[0], dialog);
 //                    CommonUtils.showToast(extra.getName());
                 }
             });
@@ -218,17 +242,80 @@ public class ListOfProducts extends AppCompatActivity {
 
     private void getCartids() {
         HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
-        if (map != null && map.size() > 0) {
-            for (Map.Entry me : map.entrySet()) {
-                System.out.println("Key: " + me.getKey() + " & Value: " + me.getValue());
-                productIdList.add(me.getValue());
-            }
-            if (adapter != null) {
-                adapter.setProductIdList(productIdList);
+        if (map != null ) {
+            if(map.size()>0) {
+                for (Map.Entry me : map.entrySet()) {
+                    System.out.println("Key: " + me.getKey() + " & Value: " + me.getValue());
+                    productIdList.add(me.getValue());
+                }
+                if (adapter != null) {
+                    adapter.setProductIdList(productIdList);
+                }
+            }else{
+                productIdList=new ArrayList();
+                if (adapter != null) {
+                    adapter.setProductIdList(productIdList);
+                }
             }
         }
 
     }
+
+    private void removeFromCartProduct(final Product product) {
+        wholeLayout.setVisibility(View.VISIBLE);
+        UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
+        Call<AddToCartResponse> call = getResponse.addToCart(
+                SharedPrefs.getToken(), "" + product.getId(), "" + 0
+        );
+        call.enqueue(new Callback<AddToCartResponse>() {
+            @Override
+            public void onResponse(Call<AddToCartResponse> call, Response<AddToCartResponse> response) {
+                if (response.isSuccessful()) {
+                    wholeLayout.setVisibility(View.GONE);
+                    AddToCartResponse object = response.body();
+                    if (object != null) {
+                        if (object.getMeta().getMessage().equalsIgnoreCase("Successfully Added")) {
+//                            dialog.dismiss();
+//                            CommonUtils.showToast(object.getMeta().getMessage());
+//                            HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
+//                            if (map != null) {
+//                                map.put(product.getId(), product.getId());
+//                                SharedPrefs.setCartMenuIds(map);
+//                            } else {
+//                                map = new HashMap<>();
+//                                map.put(product.getId(), product.getId());
+//                                SharedPrefs.setCartMenuIds(map);
+//                            }
+//                            getCartids();
+                        } else if (object.getMeta().getMessage().equalsIgnoreCase("Successfully Removed")) {
+//                            dialog.dismiss();
+                            CommonUtils.showToast(object.getMeta().getMessage());
+                            HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
+                            if (map != null) {
+                                map.remove(product.getId(), product.getId());
+                                SharedPrefs.setCartMenuIds(map);
+                            } else {
+                                map = new HashMap<>();
+                                map.remove(product.getId(), product.getId());
+                                SharedPrefs.setCartMenuIds(map);
+                            }
+                            getCartids();
+                        }
+                    } else {
+                        CommonUtils.showToast("There is some error");
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<AddToCartResponse> call, Throwable t) {
+                wholeLayout.setVisibility(View.GONE);
+                CommonUtils.showToast(t.getMessage());
+            }
+        });
+    }
+
 
     private void addToCartProduct(final Product product, int edi, final Dialog dialog) {
         wholeLayout.setVisibility(View.VISIBLE);
@@ -256,6 +343,19 @@ public class ListOfProducts extends AppCompatActivity {
                                 SharedPrefs.setCartMenuIds(map);
                             }
                             getCartids();
+                        } else if (object.getMeta().getMessage().equalsIgnoreCase("Successfully Removed")) {
+                            dialog.dismiss();
+                            CommonUtils.showToast(object.getMeta().getMessage());
+                            HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
+                            if (map != null) {
+                                map.remove(product.getId(), product.getId());
+                                SharedPrefs.setCartMenuIds(map);
+                            } else {
+                                map = new HashMap<>();
+                                map.remove(product.getId(), product.getId());
+                                SharedPrefs.setCartMenuIds(map);
+                            }
+                            getCartids();
                         }
                     } else {
                         dialog.dismiss();
@@ -273,6 +373,7 @@ public class ListOfProducts extends AppCompatActivity {
             }
         });
     }
+
 
     private void addExtraToCartProduct(final Product product) {
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);

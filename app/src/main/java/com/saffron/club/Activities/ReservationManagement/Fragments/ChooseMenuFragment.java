@@ -166,8 +166,69 @@ public class ChooseMenuFragment extends Fragment {
 
 //                addToCartProduct(product);
             }
+
+            @Override
+            public void onRemoveFromCart(Product product1) {
+                removeFromCartProduct(product1);
+
+            }
         });
         recyclerView.setAdapter(productListAdapter);
+    }
+
+    private void removeFromCartProduct(final Product product) {
+        wholeLayout.setVisibility(View.VISIBLE);
+        UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
+        Call<AddToCartResponse> call = getResponse.addToCart(
+                SharedPrefs.getToken(), "" + product.getId(), "" + 0
+        );
+        call.enqueue(new Callback<AddToCartResponse>() {
+            @Override
+            public void onResponse(Call<AddToCartResponse> call, Response<AddToCartResponse> response) {
+                if (response.isSuccessful()) {
+                    wholeLayout.setVisibility(View.GONE);
+                    AddToCartResponse object = response.body();
+                    if (object != null) {
+                        if (object.getMeta().getMessage().equalsIgnoreCase("Successfully Added")) {
+//                            dialog.dismiss();
+//                            CommonUtils.showToast(object.getMeta().getMessage());
+//                            HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
+//                            if (map != null) {
+//                                map.put(product.getId(), product.getId());
+//                                SharedPrefs.setCartMenuIds(map);
+//                            } else {
+//                                map = new HashMap<>();
+//                                map.put(product.getId(), product.getId());
+//                                SharedPrefs.setCartMenuIds(map);
+//                            }
+//                            getCartids();
+                        } else if (object.getMeta().getMessage().equalsIgnoreCase("Successfully Removed")) {
+//                            dialog.dismiss();
+                            CommonUtils.showToast(object.getMeta().getMessage());
+                            HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
+                            if (map != null) {
+                                map.remove(product.getId(), product.getId());
+                                SharedPrefs.setCartMenuIds(map);
+                            } else {
+                                map = new HashMap<>();
+                                map.remove(product.getId(), product.getId());
+                                SharedPrefs.setCartMenuIds(map);
+                            }
+                            getCartids();
+                        }
+                    } else {
+                        CommonUtils.showToast("There is some error");
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<AddToCartResponse> call, Throwable t) {
+                wholeLayout.setVisibility(View.GONE);
+                CommonUtils.showToast(t.getMessage());
+            }
+        });
     }
 
     private void showExtrasAlert(final Product product) {
@@ -316,17 +377,25 @@ public class ChooseMenuFragment extends Fragment {
 
     private void getCartids() {
         HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
-        if (map != null && map.size() > 0) {
-            for (Map.Entry me : map.entrySet()) {
-                System.out.println("Key: " + me.getKey() + " & Value: " + me.getValue());
-                productIdList.add(me.getValue());
-            }
-            if (productListAdapter != null) {
-                productListAdapter.setProductIdList(productIdList);
+        if (map != null) {
+            if (map.size() > 0) {
+                for (Map.Entry me : map.entrySet()) {
+                    System.out.println("Key: " + me.getKey() + " & Value: " + me.getValue());
+                    productIdList.add(me.getValue());
+                }
+                if (productListAdapter != null) {
+                    productListAdapter.setProductIdList(productIdList);
+                }
+            } else {
+                productIdList = new ArrayList();
+                if (productListAdapter != null) {
+                    productListAdapter.setProductIdList(productIdList);
+                }
             }
         }
 
     }
+
 
     private void chooseProductApi(MenuModel menu) {
         wholeLayout.setVisibility(View.VISIBLE);

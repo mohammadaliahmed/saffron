@@ -41,10 +41,10 @@ import retrofit2.Response;
 public class FindTableFragment extends Fragment {
 
     Context context;
-    EditText name, guestCount, dateTime;
+    EditText name, guestCount, dateOnly, timeOnly;
     Button confirmBooking;
     TextView cancel;
-    ImageView editDate;
+    ImageView editDate, editTime;
     RelativeLayout wholeLayout;
 
     ImageView table;
@@ -53,7 +53,9 @@ public class FindTableFragment extends Fragment {
     private int mDay;
     private int mHour;
     private int mMinute;
-    private String timeSet;
+    private int mEHour;
+    private int mEMinute;
+    private String timeSet, timeSetE;
     public static String persons;
     public static MakeReservationResponse reservation;
     public static String date;
@@ -73,22 +75,24 @@ public class FindTableFragment extends Fragment {
         final View view = inflater.inflate(R.layout.fragment_find_table, container, false);
         guestCount = view.findViewById(R.id.guestCount);
         name = view.findViewById(R.id.name);
-        dateTime = view.findViewById(R.id.dateTime);
+        timeOnly = view.findViewById(R.id.timeOnly);
+        dateOnly = view.findViewById(R.id.dateOnly);
         confirmBooking = view.findViewById(R.id.confirmBooking);
         cancel = view.findViewById(R.id.cancel);
         editDate = view.findViewById(R.id.editDate);
+        editTime = view.findViewById(R.id.editTime);
         wholeLayout = view.findViewById(R.id.wholeLayout);
 
 
         name.setText(SharedPrefs.getUserModel().
 
                 getName());
-        dateTime.setOnClickListener(new View.OnClickListener()
+        dateOnly.setOnClickListener(new View.OnClickListener()
 
         {
             @Override
             public void onClick(View v) {
-                showDateeDialog(dateTime);
+                showDateeDialog(dateOnly);
             }
         });
 
@@ -98,7 +102,25 @@ public class FindTableFragment extends Fragment {
         {
             @Override
             public void onClick(View v) {
-                showDateeDialog(dateTime);
+                showDateeDialog(dateOnly);
+            }
+
+        });
+        timeOnly.setOnClickListener(new View.OnClickListener()
+
+        {
+            @Override
+            public void onClick(View v) {
+                showTimeAlert(timeOnly);
+            }
+
+        });
+        editTime.setOnClickListener(new View.OnClickListener()
+
+        {
+            @Override
+            public void onClick(View v) {
+                showTimeAlert(timeOnly);
             }
 
         });
@@ -109,8 +131,8 @@ public class FindTableFragment extends Fragment {
         {
             @Override
             public void onClick(View v) {
-                if (dateTime.getText().length() == 0) {
-                    dateTime.setError("Please select date and time for booking");
+                if (dateOnly.getText().length() == 0) {
+                    dateOnly.setError("Please select date and time for booking");
                 } else if (guestCount.getText().length() == 0) {
                     guestCount.setError("Enter number of persons");
                 } else {
@@ -138,8 +160,8 @@ public class FindTableFragment extends Fragment {
 
     private void confirmBookingNow(final RelativeLayout wholeLayout) {
         wholeLayout.setVisibility(View.VISIBLE);
-         date = mYear + "-" + mMonth + "-" + mDay;
-         time = mHour + ":" + mMinute + timeSet;
+        date = mYear + "-" + mMonth + "-" + mDay;
+        time = mHour + ":" + mMinute + timeSet;
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
         Call<MakeReservationResponse> call = getResponse.bookTable(
                 SharedPrefs.getToken(),
@@ -194,52 +216,95 @@ public class FindTableFragment extends Fragment {
                         mDay = dayOfMonth;
 
                         dateTime.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-                        showTimeAlert();
+//                        showTimeAlert();
 
-                    }
 
-                    private void showTimeAlert() {
-                        final Calendar c = Calendar.getInstance();
-                        mHour = c.get(Calendar.HOUR_OF_DAY);
-                        mMinute = c.get(Calendar.MINUTE);
-
-                        // Launch Time Picker Dialog
-                        TimePickerDialog timePickerDialog = new TimePickerDialog(context,
-                                new TimePickerDialog.OnTimeSetListener() {
-
-                                    @Override
-                                    public void onTimeSet(TimePicker view, int hourOfDay,
-                                                          int minute) {
-                                        mHour = hourOfDay;
-                                        mMinute = minute;
-                                        timeSet = "";
-                                        if (mHour > 12) {
-                                            mHour -= 12;
-                                            timeSet = "PM";
-                                        } else if (mHour == 0) {
-                                            mHour += 12;
-                                            timeSet = "AM";
-                                        } else if (mHour == 12) {
-                                            timeSet = "PM";
-                                        } else {
-                                            timeSet = "AM";
-                                        }
-
-                                        String min = "";
-                                        if (mMinute < 10)
-                                            min = "0" + mMinute;
-                                        else
-                                            min = String.valueOf(mMinute);
-
-                                        String aTime = new StringBuilder().append(mHour).append(':')
-                                                .append(min).append(" ").append(timeSet).toString();
-                                        dateTime.setText(mDay + "-" + (mMonth + 1) + "-" + mYear + " " + aTime);
-                                    }
-                                }, mHour, mMinute, false);
-                        timePickerDialog.show();
                     }
                 }, mYear, mMonth, mDay);
         datePickerDialog.show();
+    }
+
+    private void showTimeAlert(final EditText timeOnly) {
+        final Calendar c = Calendar.getInstance();
+        mHour = c.get(Calendar.HOUR_OF_DAY);
+        mMinute = c.get(Calendar.MINUTE);
+
+        // Launch Time Picker Dialog
+        TimePickerDialog timePickerDialog = new TimePickerDialog(context,
+                new TimePickerDialog.OnTimeSetListener() {
+
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay,
+                                          int minute) {
+                        mHour = hourOfDay;
+                        mMinute = minute;
+                        timeSet = "";
+                        if (mHour > 12) {
+                            mHour -= 12;
+                            timeSet = "PM";
+                        } else if (mHour == 0) {
+                            mHour += 12;
+                            timeSet = "AM";
+                        } else if (mHour == 12) {
+                            timeSet = "PM";
+                        } else {
+                            timeSet = "AM";
+                        }
+
+                        String min = "";
+                        if (mMinute < 10)
+                            min = "0" + mMinute;
+                        else
+                            min = String.valueOf(mMinute);
+
+                        String aTime = new StringBuilder().append(mHour).append(':')
+                                .append(min).append(" ").append(timeSet).toString();
+                        timeOnly.setText(aTime);
+                        showEndTimeAlert(timeOnly, aTime);
+                    }
+                }, mHour, mMinute, false);
+        timePickerDialog.show();
+    }
+
+    private void showEndTimeAlert(final EditText timeOnly, final String aTime) {
+        final Calendar c = Calendar.getInstance();
+        mHour = c.get(Calendar.HOUR_OF_DAY);
+        mMinute = c.get(Calendar.MINUTE);
+
+        // Launch Time Picker Dialog
+        TimePickerDialog timePickerDialog = new TimePickerDialog(context,
+                new TimePickerDialog.OnTimeSetListener() {
+
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay,
+                                          int minute) {
+                        mEHour = hourOfDay;
+                        mEMinute = minute;
+                        timeSetE = "";
+                        if (mEHour > 12) {
+                            mEHour -= 12;
+                            timeSetE = "PM";
+                        } else if (mEHour == 0) {
+                            mHour += 12;
+                            timeSetE = "AM";
+                        } else if (mEHour == 12) {
+                            timeSetE = "PM";
+                        } else {
+                            timeSetE = "AM";
+                        }
+
+                        String min = "";
+                        if (mEMinute < 10)
+                            min = "0" + mEMinute;
+                        else
+                            min = String.valueOf(mEMinute);
+
+                        String bTime = new StringBuilder().append(mEHour).append(':')
+                                .append(min).append(" ").append(timeSetE).toString();
+                        timeOnly.setText(aTime + "->" + bTime);
+                    }
+                }, mHour, mMinute, false);
+        timePickerDialog.show();
     }
 
     @Override

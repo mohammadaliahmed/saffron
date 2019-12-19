@@ -431,10 +431,12 @@ public class CartActivity extends AppCompatActivity {
                 itemList.remove(positionn);
                 adapter.setItemList(itemList);
                 HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
-                map.remove(Integer.parseInt(productt));
-                SharedPrefs.setCartMenuIds(map);
-                if (itemList.size() == 0) {
-                    SharedPrefs.clearCartMenuIds();
+                if(map!=null) {
+                    map.remove(Integer.parseInt(productt));
+                    SharedPrefs.setCartMenuIds(map);
+                    if (itemList.size() == 0) {
+                        SharedPrefs.clearCartMenuIds();
+                    }
                 }
                 calculateTotal();
                 removeMenuApi(idd);
