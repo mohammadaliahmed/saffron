@@ -67,6 +67,32 @@ public class SharedPrefs {
 
     }
 
+    public static void setTableIds(HashMap<Integer, Integer> itemList) {
+
+        Gson gson = new Gson();
+        String json = gson.toJson(itemList);
+        preferenceSetter("tableId", json);
+    }
+
+    public static HashMap<Integer, Integer> getTableIds() {
+        Gson gson = new Gson();
+
+        HashMap<Integer, Integer> retMap = new Gson().fromJson(
+                preferenceGetter("tableId"), new TypeToken<HashMap<Integer, Integer>>() {
+                }.getType()
+        );
+
+        return retMap;
+    }
+
+    public static void clearTableIds() {
+        Gson gson = new Gson();
+        String json = "";
+        preferenceSetter("tableId", json);
+
+
+    }
+
     public static void setToken(String token) {
         preferenceSetter("token", token);
     }

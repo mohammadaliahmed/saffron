@@ -20,6 +20,13 @@ public class ChooseTableAdapter extends RecyclerView.Adapter<ChooseTableAdapter.
     Context context;
     List<Table> itemList;
     ChooseTableCallback callback;
+    ArrayList<String> productIdList = new ArrayList<>();
+
+
+    public void setProductIdList(ArrayList<String> productIdList) {
+        this.productIdList = productIdList;
+        notifyDataSetChanged();
+    }
 
     public ChooseTableAdapter(Context context, List<Table> itemList, ChooseTableCallback callback) {
         this.context = context;
@@ -43,12 +50,34 @@ public class ChooseTableAdapter extends RecyclerView.Adapter<ChooseTableAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Table table = itemList.get(position);
-        holder.tableId.setText("Persons: " + table.getPersons());
-        holder.bookTable.setText("Book " + table.getName());
+
+        boolean canAdd = true;
+        if (productIdList.contains(table.getId())) {
+            holder.bookTable.setText("Remove");
+            holder.bookTable.setBackground(context.getResources().getDrawable(R.drawable.btn_bg_empty));
+            holder.bookTable.setTextColor(context.getResources().getColor(R.color.colorSaffron));
+            canAdd = false;
+        } else {
+            holder.bookTable.setText("Add");
+            holder.bookTable.setBackground(context.getResources().getDrawable(R.drawable.btn_bg_green));
+            holder.bookTable.setTextColor(context.getResources().getColor(R.color.colorWhite));
+
+
+        }
+
+        final boolean finalCanAdd = canAdd;
+
+        holder.tableId.setText("Table: " + table.getId() + "\nPersons: " + table.getPersons());
+//        holder.bookTable.setText("Book " + table.getName());
         holder.bookTable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.onTableChosen(table);
+                if (finalCanAdd) {
+                    callback.onTableChosen(table);
+                } else {
+                    callback.onTableRemove(table);
+
+                }
             }
         });
     }
@@ -72,5 +101,7 @@ public class ChooseTableAdapter extends RecyclerView.Adapter<ChooseTableAdapter.
 
     public interface ChooseTableCallback {
         public void onTableChosen(Table table);
+
+        public void onTableRemove(Table table);
     }
 }

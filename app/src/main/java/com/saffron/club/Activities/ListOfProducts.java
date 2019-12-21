@@ -28,8 +28,10 @@ import com.saffron.club.Adapters.ExtrasProductAdapter;
 import com.saffron.club.Adapters.VariationListAdapter;
 import com.saffron.club.Adapters.ProductListAdapter;
 import com.saffron.club.Models.Extra;
+import com.saffron.club.Models.MenuModel;
 import com.saffron.club.Models.Product;
 import com.saffron.club.NetworkResponses.AddToCartResponse;
+import com.saffron.club.NetworkResponses.ConfirmBookingResponse;
 import com.saffron.club.NetworkResponses.ProductResponse;
 import com.saffron.club.R;
 import com.saffron.club.Utils.AppConfig;
@@ -165,6 +167,7 @@ public class ListOfProducts extends AppCompatActivity {
 
         RecyclerView variation = layout.findViewById(R.id.variationRecycler);
         RecyclerView extrasRecycler = layout.findViewById(R.id.extrasRecycler);
+        LinearLayout extrasLayout = layout.findViewById(R.id.extrasLayout);
 
         title.setText(product.getName());
         Glide.with(this).load(AppConfig.BASE_URL_Image + product.getImage()).into(picture);
@@ -175,22 +178,37 @@ public class ListOfProducts extends AppCompatActivity {
                 @Override
                 public void onSelect(Extra extra) {
                     eid[0] = extra.getId();
-//                    list.add(extra.getId());
-                    showAddToCartAlert(product, eid[0], dialog);
+                    list.add(extra.getId());
+//                    showAddToCartAlert(product, eid[0], dialog);
 //                    CommonUtils.showToast(extra.getName());
+                }
+
+                @Override
+                public void onRemove(Extra extra) {
+                    list.remove(extra.getId());
+
                 }
             });
             variation.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
             variation.setAdapter(adapter2);
         }
-        extrasRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        ExtrasProductAdapter extrasProductAdapter = new ExtrasProductAdapter(this, MainActivity.additionalItems, new ExtrasProductAdapter.AddExtraCallback() {
-            @Override
-            public void onAdd(Product product) {
-                addExtraToCartProduct(product);
-            }
-        });
-        extrasRecycler.setAdapter(extrasProductAdapter);
+        if (categoryId != 5) {
+            extrasLayout.setVisibility(View.VISIBLE);
+
+            extrasRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+            ExtrasProductAdapter extrasProductAdapter = new ExtrasProductAdapter(this, MainActivity.additionalItems, new ExtrasProductAdapter.AddExtraCallback() {
+                @Override
+                public void onAdd(Product product) {
+                    addExtraToCartProduct(product);
+                }
+
+                @Override
+                public void onRemove(Product product) {
+                    removeFromCartProduct(product);
+                }
+            });
+            extrasRecycler.setAdapter(extrasProductAdapter);
+        }
 
         addToCart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -241,9 +259,10 @@ public class ListOfProducts extends AppCompatActivity {
     }
 
     private void getCartids() {
+        productIdList.clear();
         HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
-        if (map != null ) {
-            if(map.size()>0) {
+        if (map != null) {
+            if (map.size() > 0) {
                 for (Map.Entry me : map.entrySet()) {
                     System.out.println("Key: " + me.getKey() + " & Value: " + me.getValue());
                     productIdList.add(me.getValue());
@@ -251,8 +270,8 @@ public class ListOfProducts extends AppCompatActivity {
                 if (adapter != null) {
                     adapter.setProductIdList(productIdList);
                 }
-            }else{
-                productIdList=new ArrayList();
+            } else {
+                productIdList = new ArrayList();
                 if (adapter != null) {
                     adapter.setProductIdList(productIdList);
                 }
@@ -264,8 +283,8 @@ public class ListOfProducts extends AppCompatActivity {
     private void removeFromCartProduct(final Product product) {
         wholeLayout.setVisibility(View.VISIBLE);
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
-        Call<AddToCartResponse> call = getResponse.addToCart(
-                SharedPrefs.getToken(), "" + product.getId(), "" + 0
+        Call<AddToCartResponse> call = getResponse.removeFromCart(
+                SharedPrefs.getToken(), "" + product.getId()
         );
         call.enqueue(new Callback<AddToCartResponse>() {
             @Override
@@ -276,27 +295,27 @@ public class ListOfProducts extends AppCompatActivity {
                     if (object != null) {
                         if (object.getMeta().getMessage().equalsIgnoreCase("Successfully Added")) {
 //                            dialog.dismiss();
-//                            CommonUtils.showToast(object.getMeta().getMessage());
-//                            HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
-//                            if (map != null) {
-//                                map.put(product.getId(), product.getId());
-//                                SharedPrefs.setCartMenuIds(map);
-//                            } else {
-//                                map = new HashMap<>();
-//                                map.put(product.getId(), product.getId());
-//                                SharedPrefs.setCartMenuIds(map);
-//                            }
-//                            getCartids();
+                            CommonUtils.showToast(object.getMeta().getMessage());
+                            HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
+                            if (map != null) {
+                                map.put(product.getId(), product.getId());
+                                SharedPrefs.setCartMenuIds(map);
+                            } else {
+                                map = new HashMap<>();
+                                map.put(product.getId(), product.getId());
+                                SharedPrefs.setCartMenuIds(map);
+                            }
+                            getCartids();
                         } else if (object.getMeta().getMessage().equalsIgnoreCase("Successfully Removed")) {
 //                            dialog.dismiss();
                             CommonUtils.showToast(object.getMeta().getMessage());
                             HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
                             if (map != null) {
-                                map.remove(product.getId(), product.getId());
+                                map.remove(product.getId());
                                 SharedPrefs.setCartMenuIds(map);
                             } else {
                                 map = new HashMap<>();
-                                map.remove(product.getId(), product.getId());
+                                map.remove(product.getId());
                                 SharedPrefs.setCartMenuIds(map);
                             }
                             getCartids();
@@ -348,11 +367,11 @@ public class ListOfProducts extends AppCompatActivity {
                             CommonUtils.showToast(object.getMeta().getMessage());
                             HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
                             if (map != null) {
-                                map.remove(product.getId(), product.getId());
+                                map.remove(product.getId());
                                 SharedPrefs.setCartMenuIds(map);
                             } else {
                                 map = new HashMap<>();
-                                map.remove(product.getId(), product.getId());
+                                map.remove(product.getId());
                                 SharedPrefs.setCartMenuIds(map);
                             }
                             getCartids();
@@ -401,6 +420,9 @@ public class ListOfProducts extends AppCompatActivity {
             }
         });
     }
+
+
+
 
     private void getProductsDataFromDB() {
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);

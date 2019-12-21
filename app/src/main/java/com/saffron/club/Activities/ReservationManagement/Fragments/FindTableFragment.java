@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.saffron.club.Activities.MainActivity;
 import com.saffron.club.Activities.ReservationManagement.BookTable;
@@ -60,6 +61,7 @@ public class FindTableFragment extends Fragment {
     public static MakeReservationResponse reservation;
     public static String date;
     public static String time;
+    boolean today = false;
 
     public FindTableFragment() {
     }
@@ -199,6 +201,7 @@ public class FindTableFragment extends Fragment {
     }
 
     private void showDateeDialog(final TextView dateTime) {
+
         final Calendar c = Calendar.getInstance();
         mYear = c.get(Calendar.YEAR);
         mMonth = c.get(Calendar.MONTH);
@@ -214,20 +217,30 @@ public class FindTableFragment extends Fragment {
                         mYear = year;
                         mMonth = monthOfYear + 1;
                         mDay = dayOfMonth;
+                        long cur = System.currentTimeMillis();
+                        String abc = dayOfMonth + "-" + (monthOfYear + 1) + "-" + year;
+                        dateTime.setText(abc);
 
-                        dateTime.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                        if (CommonUtils.getDate(cur).equalsIgnoreCase(abc)) {
+                            today = true;
+                        } else {
+                            today = false;
+                        }
 //                        showTimeAlert();
 
 
                     }
                 }, mYear, mMonth, mDay);
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
+
+
     }
 
     private void showTimeAlert(final EditText timeOnly) {
         final Calendar c = Calendar.getInstance();
-        mHour = c.get(Calendar.HOUR_OF_DAY);
-        mMinute = c.get(Calendar.MINUTE);
+//        mHour = c.get(Calendar.HOUR_OF_DAY);
+//        mMinute = c.get(Calendar.MINUTE);
 
         // Launch Time Picker Dialog
         TimePickerDialog timePickerDialog = new TimePickerDialog(context,
@@ -257,19 +270,35 @@ public class FindTableFragment extends Fragment {
                         else
                             min = String.valueOf(mMinute);
 
-                        String aTime = new StringBuilder().append(mHour).append(':')
-                                .append(min).append(" ").append(timeSet).toString();
-                        timeOnly.setText(aTime);
-                        showEndTimeAlert(timeOnly, aTime);
+                        Calendar calendar = Calendar.getInstance();
+                        if (today) {
+                            if ((hourOfDay <= (calendar.get(Calendar.HOUR_OF_DAY))) &&
+                                    (minute <= (calendar.get(Calendar.MINUTE)))) {
+                                Toast.makeText(getActivity(), "Time is passed\nPlease select next hour",
+                                        Toast.LENGTH_SHORT).show();
+                                showTimeAlert(timeOnly);
+                            } else {
+                                String aTime = new StringBuilder().append(mHour).append(':')
+                                        .append(min).append(" ").append(timeSet).toString();
+                                timeOnly.setText(aTime);
+                                showEndTimeAlert(timeOnly, aTime, hourOfDay, minute);
+                            }
+                        } else {
+                            String aTime = new StringBuilder().append(mHour).append(':')
+                                    .append(min).append(" ").append(timeSet).toString();
+                            timeOnly.setText(aTime);
+                            showEndTimeAlert(timeOnly, aTime, hourOfDay, minute);
+                        }
                     }
                 }, mHour, mMinute, false);
+        timePickerDialog.setTitle("Select From Time ");
         timePickerDialog.show();
     }
 
-    private void showEndTimeAlert(final EditText timeOnly, final String aTime) {
+    private void showEndTimeAlert(final EditText timeOnly, final String aTime, final int hrrr, final int minnnn) {
         final Calendar c = Calendar.getInstance();
-        mHour = c.get(Calendar.HOUR_OF_DAY);
-        mMinute = c.get(Calendar.MINUTE);
+//        mHour = c.get(Calendar.HOUR_OF_DAY);
+//        mMinute = c.get(Calendar.MINUTE);
 
         // Launch Time Picker Dialog
         TimePickerDialog timePickerDialog = new TimePickerDialog(context,
@@ -299,9 +328,22 @@ public class FindTableFragment extends Fragment {
                         else
                             min = String.valueOf(mEMinute);
 
-                        String bTime = new StringBuilder().append(mEHour).append(':')
-                                .append(min).append(" ").append(timeSetE).toString();
-                        timeOnly.setText(aTime + "->" + bTime);
+                        if (today) {
+                            if (((hourOfDay) <= hrrr)) {
+                                Toast.makeText(getActivity(), "End time should be greater than start time",
+                                        Toast.LENGTH_SHORT).show();
+                                showEndTimeAlert(timeOnly, aTime, hrrr, minnnn);
+                            } else {
+
+                                String bTime = new StringBuilder().append(mEHour).append(':')
+                                        .append(min).append(" ").append(timeSetE).toString();
+                                timeOnly.setText(aTime + " -> " + bTime);
+                            }
+                        } else {
+                            String bTime = new StringBuilder().append(mEHour).append(':')
+                                    .append(min).append(" ").append(timeSetE).toString();
+                            timeOnly.setText(aTime + "->" + bTime);
+                        }
                     }
                 }, mHour, mMinute, false);
         timePickerDialog.show();

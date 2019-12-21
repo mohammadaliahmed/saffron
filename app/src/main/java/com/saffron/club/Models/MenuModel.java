@@ -20,7 +20,7 @@ public class MenuModel {
     private String productt;
     @SerializedName("extra")
     @Expose
-    private Object extra;
+    private String extra;
     @SerializedName("sub_total")
     @Expose
     private Object subTotal;
@@ -80,11 +80,11 @@ public class MenuModel {
         this.product = product;
     }
 
-    public Object getExtra() {
+    public String getExtra() {
         return extra;
     }
 
-    public void setExtra(Object extra) {
+    public void setExtra(String extra) {
         this.extra = extra;
     }
 

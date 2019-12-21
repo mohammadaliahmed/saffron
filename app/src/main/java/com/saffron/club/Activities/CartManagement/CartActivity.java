@@ -88,6 +88,7 @@ public class CartActivity extends AppCompatActivity {
     private boolean mLenNumber = false, mLenMonth = false, mLenYear = false, mLenCVC = false, mLenName = false;
     TextView chooseLocation, distance, cost;
     RadioButton homeDelivery, pickUp;
+    LinearLayout deliveryTypeLayout;
 
 
     //paypal
@@ -107,6 +108,8 @@ public class CartActivity extends AppCompatActivity {
     RelativeLayout wholeLayout;
     LinearLayout deliverySection;
     String deliveryType;
+    private boolean toAddDistance;
+    private String paymentId;
 
 
     @Override
@@ -120,6 +123,7 @@ public class CartActivity extends AppCompatActivity {
         }
         this.setTitle("Cart");
         homeDelivery = findViewById(R.id.homeDelivery);
+        deliveryTypeLayout = findViewById(R.id.deliveryTypeLayout);
         pickUp = findViewById(R.id.pickUp);
         placeOrder = findViewById(R.id.placeOrder);
         recyclerView = findViewById(R.id.recyclerView);
@@ -133,17 +137,29 @@ public class CartActivity extends AppCompatActivity {
 
 
         deliveryType = "Pick Up";
+        deliverySection.setVisibility(View.GONE);
+
 
         homeDelivery.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                deliveryType = "Home Delivery";
+                if (buttonView.isPressed()) {
+                    deliveryType = "Home Delivery";
+                    deliverySection.setVisibility(View.VISIBLE);
+                }
+                toAddDistance = true;
+
             }
         });
         pickUp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                deliveryType = "Pick Up";
+                if (buttonView.isPressed()) {
+                    deliverySection.setVisibility(View.GONE);
+                    deliveryType = "Pick Up";
+                }
+                toAddDistance = false;
+
             }
         });
 
@@ -168,6 +184,8 @@ public class CartActivity extends AppCompatActivity {
                 String title = "Saffron CLub";
                 BigDecimal Amount = BigDecimal.valueOf(total);
                 startPurchasePayPal(title, Amount);
+
+
 //                if (returnString == null) {
 //                    CommonUtils.showToast("Please select delivery location");
 //                } else {
@@ -259,17 +277,48 @@ public class CartActivity extends AppCompatActivity {
             finalUrl = finalUrl + tab;
         }
         count = 0;
+        int extraCount = 0;
         for (MenuModel model : itemList) {
             String menu = "";
             menu = menu + "&product[" + count + "]=" + model.getProduct().getId();
-            if (model.getProduct().getExtras() != null) {
-                menu = menu + "&extra[" + count + "]=" + model.getProduct().getExtras().get(0).getId();
+            if (model.getVariation() != null) {
+                menu = menu + "&extra[" + count + "]=" + model.getVariation().getId();
+                menu = menu + "&price[" + count + "]=" + model.getVariation().getPrice();
+
+            } else {
+                menu = menu + "&extra[" + count + "]=" + 0;
+                menu = menu + "&price[" + count + "]=" + model.getProduct().getPrice();
+
             }
             menu = menu + "&quantity[" + count + "]=" + model.getQuantity();
+            double subtotal = 0;
+            if (model.getVariation() != null) {
+                subtotal = Double.parseDouble(model.getVariation().getPrice()) * model.getQuantity();
+                menu = menu + "&varid[" + count + "]=" + model.getVariation().getId();
+
+            } else {
+                subtotal = Double.parseDouble(model.getProduct().getPrice()) * model.getQuantity();
+            }
+            menu = menu + "&subtotal[" + count + "]=" + subtotal;
+
             count++;
             finalUrl = finalUrl + menu;
         }
-        finalUrl=finalUrl+"&delivery_type="+deliveryType;
+        int typee = 0;
+        if (deliveryType.equalsIgnoreCase("Pick up")) {
+            typee = 1;
+        } else if (deliveryType.equalsIgnoreCase("Home Delivery")) {
+            typee = 2;
+
+        }
+        finalUrl = finalUrl + "&order_type=" + typee;
+        finalUrl = finalUrl + "&lang=" + lon;
+        finalUrl = finalUrl + "&lat=" + lat;
+        finalUrl = finalUrl + "&drop_location=" + CommonUtils.getFullAddress(CartActivity.this, lat, lon);
+        finalUrl = finalUrl + "&payment_method=Paypal";
+        finalUrl = finalUrl + "&payment_status=1";
+        finalUrl = finalUrl + "&transaction_id=" + paymentId;
+
         count = 0;
 
 
@@ -286,6 +335,7 @@ public class CartActivity extends AppCompatActivity {
                     if (response.body().getMeta().getMessage().equalsIgnoreCase("Order Placed ")) {
                         CommonUtils.showToast("Order Placed Succesffuly");
                         SharedPrefs.clearCartMenuIds();
+                        SharedPrefs.clearTableIds();
                         Intent i = new Intent(CartActivity.this, MainActivity.class);
                         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(i);
@@ -305,36 +355,7 @@ public class CartActivity extends AppCompatActivity {
             }
         });
     }
-
-
-    private void showBottomDialog() {
-        final BottomSheetDialog dialog = new BottomSheetDialog(CartActivity.this);
-        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        View layout = layoutInflater.inflate(R.layout.alert_card_design, null);
-
-        dialog.setContentView(layout);
-        TextView payAmount = layout.findViewById(R.id.payAmount);
-        payAmount.setText("Pay $" + totall + " using your card");
-
-        mNumber = layout.findViewById(R.id.num);
-        mMonth = layout.findViewById(R.id.month);
-        mYear = layout.findViewById(R.id.year);
-        mCVC = layout.findViewById(R.id.cvc);
-        mName = layout.findViewById(R.id.card_name);
-        Button pay = layout.findViewById(R.id.pay);
-        pay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (validateInputData())
-                    cardDetails(dialog);
-            }
-        });
-        mNumber.addTextChangedListener(new FourDigitCardFormatWatcher());
-
-
-        dialog.show();
-    }
+//
 
     @Override
     public void onDestroy() {
@@ -431,7 +452,7 @@ public class CartActivity extends AppCompatActivity {
                 itemList.remove(positionn);
                 adapter.setItemList(itemList);
                 HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
-                if(map!=null) {
+                if (map != null) {
                     map.remove(Integer.parseInt(productt));
                     SharedPrefs.setCartMenuIds(map);
                     if (itemList.size() == 0) {
@@ -516,6 +537,17 @@ public class CartActivity extends AppCompatActivity {
                     RemoveMenuResponse abc = response.body();
                     if (abc.getMeta().getMessage().equalsIgnoreCase("Successfully Removed")) {
                         CommonUtils.showToast("Item Removed");
+                        SharedPrefs.clearTableIds();
+                        if (tableList.size() > 0) {
+                            toAddDistance = false;
+                            deliverySection.setVisibility(View.GONE);
+                            deliveryTypeLayout.setVisibility(View.GONE);
+                        } else {
+                            deliverySection.setVisibility(View.GONE);
+                            deliveryTypeLayout.setVisibility(View.VISIBLE);
+                            toAddDistance = true;
+
+                        }
                     }
                 }
             }
@@ -546,14 +578,25 @@ public class CartActivity extends AppCompatActivity {
                         tableList = confirmBookingResponse.getConfirmBookingModel().getBookings();
                         if (tableList.size() > 0) {
                             deliverySection.setVisibility(View.GONE);
+                            deliveryTypeLayout.setVisibility(View.GONE);
                         } else {
-                            deliverySection.setVisibility(View.VISIBLE);
+                            deliverySection.setVisibility(View.GONE);
+                            deliveryTypeLayout.setVisibility(View.VISIBLE);
+
 
                         }
                         for (MenuModel menuModel : confirmBookingResponse.getConfirmBookingModel().getMenu()) {
                             if (menuModel.getProduct() != null) {
                                 menuModel.setQuantity(1);
-                                itemList.add(menuModel);
+                                boolean found = false;
+//                                for (MenuModel menuModel1 : itemList) {
+//                                    if (menuModel.getProduct().getId() == menuModel1.getProduct().getId()) {
+//                                        found = true;
+//                                    }
+//                                }
+//                                if (!found) {
+                                    itemList.add(menuModel);
+//                                }
                             }
                         }
                         if (itemList.size() > 0) {
@@ -579,7 +622,12 @@ public class CartActivity extends AppCompatActivity {
     private void calculateTotal() {
         total = 0;
         for (MenuModel menuModel : itemList) {
-            total = total + (menuModel.getQuantity() * Double.parseDouble(menuModel.getProduct().getPrice()));
+            if(Integer.parseInt(menuModel.getExtra())==0) {
+                total = total + (menuModel.getQuantity() * Double.parseDouble(menuModel.getProduct().getPrice()));
+            }else{
+                total = total + (menuModel.getQuantity() * Double.parseDouble(menuModel.getVariation().getPrice()));
+
+            }
         }
         total = total + distn;
         totall = String.format("%.2f", total);
@@ -654,21 +702,25 @@ public class CartActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
             if (data != null) {
-                returnString = data.getStringExtra("address");
-                lat = data.getDoubleExtra("lat", 0.0);
-                lon = data.getDoubleExtra("lon", 0.0);
+                if (deliveryType.equalsIgnoreCase("home delivery")) {
+                    returnString = data.getStringExtra("address");
+                    lat = data.getDoubleExtra("lat", SharedPrefs.getUserModel().getLat());
+                    lon = data.getDoubleExtra("lon", SharedPrefs.getUserModel().getLon());
 
-                chooseLocation.setText("Delivery: " + returnString);
+                    chooseLocation.setText("Delivery: " + returnString);
 
-                distn = CommonUtils.distance(lat, lon, -34.877180, 138.601850);
-                distance.setText("Distance: " + String.format("%.2f", distn) + "m");
-                cost.setText("Cost: $" + String.format("%.2f", distn * 1));
-                calculateTotal();
+                    distn = CommonUtils.distance(lat, lon, -34.877180, 138.601850);
+                    distance.setText("Distance: " + String.format("%.2f", distn) + "m");
+                    cost.setText("Cost: $" + String.format("%.2f", distn * 1));
+                    calculateTotal();
+                }
 
 
             }
         }
-        if (requestCode == REQUEST_CODE) {
+        if (requestCode == REQUEST_CODE)
+
+        {
             if (resultCode == RESULT_OK) {
                 DropInResult result = data.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
                 if (result != null) {
@@ -685,7 +737,9 @@ public class CartActivity extends AppCompatActivity {
                 Exception error = (Exception) data.getSerializableExtra(DropInActivity.EXTRA_ERROR);
             }
         }
-        if (requestCode == REQUEST_CODE_PAYMENT) {
+        if (requestCode == REQUEST_CODE_PAYMENT)
+
+        {
             if (resultCode == Activity.RESULT_OK) {
                 PaymentConfirmation confirm = data
                         .getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
@@ -701,6 +755,7 @@ public class CartActivity extends AppCompatActivity {
 //                        CommonUtils.showToast(object.getResponse().getState());
                         if (object.getResponse().getState().equalsIgnoreCase("approved")) {
                             CommonUtils.showToast("Payment successfull");
+                            paymentId = object.getResponse().getId();
                             placeOrderNow();
 //                            finish();
                         }
@@ -724,6 +779,7 @@ public class CartActivity extends AppCompatActivity {
                         .println("An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
             }
         }
+
     }
 
 

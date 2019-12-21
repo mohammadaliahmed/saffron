@@ -48,15 +48,16 @@ public class CartMenuAdapter extends RecyclerView.Adapter<CartMenuAdapter.ViewHo
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         final MenuModel menuModel = itemList.get(position);
         holder.title.setText(menuModel.getProduct().getName());
-        holder.price.setText("$" + menuModel.getProduct().getPrice());
 
-        Glide.with(context).load(AppConfig.BASE_URL_Image  + menuModel.getProduct().getImage()).into(holder.image);
+        Glide.with(context).load(AppConfig.BASE_URL_Image + menuModel.getProduct().getImage()).into(holder.image);
 
         if (menuModel.getVariation() != null) {
             holder.subtitle.setText("Option: " + menuModel.getVariation().getName());
             holder.price.setText("$" + menuModel.getVariation().getPrice());
         } else {
             holder.subtitle.setText("");
+            holder.price.setText("$" + menuModel.getProduct().getPrice());
+
         }
 
         holder.delete.setOnClickListener(new View.OnClickListener() {

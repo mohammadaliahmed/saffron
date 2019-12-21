@@ -85,7 +85,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
         final Product product = itemList.get(position);
         boolean canAdd = true;
         if (productIdList.contains(product.getId())) {
-            holder.addToCart.setText("Added");
+            holder.addToCart.setText("Remove");
             holder.addToCart.setBackground(context.getResources().getDrawable(R.drawable.btn_bg_empty));
             holder.addToCart.setTextColor(context.getResources().getColor(R.color.colorSaffron));
             canAdd = false;
@@ -100,7 +100,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
 
         holder.title.setText(product.getName());
         holder.description.setText(product.getDesc());
-        Glide.with(context).load(AppConfig.BASE_URL_Image  + product.getImage()).into(holder.image);
+        Glide.with(context).load(AppConfig.BASE_URL_Image + product.getImage()).into(holder.image);
         holder.price.setText("$ " + product.getPrice());
         final boolean finalCanAdd = canAdd;
         holder.addToCart.setOnClickListener(new View.OnClickListener() {
@@ -109,7 +109,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
 //                CommonUtils.showToast("Add to cart");
                 if (finalCanAdd) {
                     cartCallback.onAddToCart(product);
-                }else{
+                } else {
                     cartCallback.onRemoveFromCart(product);
 
                 }
@@ -124,7 +124,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
-        TextView title, price,description;
+        TextView title, price, description;
         Button addToCart;
 
         public ViewHolder(@NonNull View itemView) {

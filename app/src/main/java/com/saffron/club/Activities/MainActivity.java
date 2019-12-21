@@ -14,8 +14,10 @@ import com.saffron.club.Activities.CartManagement.CartActivity;
 import com.saffron.club.Adapters.HomePageCategoryAdapter;
 import com.saffron.club.Adapters.MainSliderAdapter;
 import com.saffron.club.Models.Category;
+import com.saffron.club.Models.MenuModel;
 import com.saffron.club.Models.Product;
 import com.saffron.club.NetworkResponses.CategoryResponse;
+import com.saffron.club.NetworkResponses.ConfirmBookingResponse;
 import com.saffron.club.NetworkResponses.ProductResponse;
 import com.saffron.club.R;
 import com.saffron.club.Utils.AppConfig;
@@ -43,6 +45,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -138,6 +141,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
+
 
     private void getProductsDataFromDB() {
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);

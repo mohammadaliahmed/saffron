@@ -11,6 +11,7 @@ import com.saffron.club.Models.Extra;
 import com.saffron.club.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -19,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class VariationListAdapter extends RecyclerView.Adapter<VariationListAdapter.ViewHolder> {
     Context context;
     List<Extra> itemList = new ArrayList<>();
-    List<Integer> selectedList = new ArrayList<>();
+    HashMap<Integer, Integer> selectedList = new HashMap<>();
 
     ExtrasCallback callback;
 
@@ -45,7 +46,7 @@ public class VariationListAdapter extends RecyclerView.Adapter<VariationListAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         final Extra extra = itemList.get(position);
-        if (selectedList.contains(position)) {
+        if (selectedList.containsKey(position)) {
             holder.layout.setBackground(context.getResources().getDrawable(R.drawable.red_corners_bold));
         } else {
             holder.layout.setBackground(context.getResources().getDrawable(R.drawable.grey_corners));
@@ -58,10 +59,16 @@ public class VariationListAdapter extends RecyclerView.Adapter<VariationListAdap
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                selected = position;
-                selectedList.add(position);
-                callback.onSelect(extra);
-                notifyDataSetChanged();
+                if (selectedList.containsKey(position)) {
+                    selectedList.remove(position);
+                    callback.onRemove(extra);
+                    notifyDataSetChanged();
+                } else {
+                    selectedList.put(position, position);
+                    callback.onSelect(extra);
+                    notifyDataSetChanged();
+                }
+
             }
         });
 
@@ -86,5 +93,7 @@ public class VariationListAdapter extends RecyclerView.Adapter<VariationListAdap
 
     public interface ExtrasCallback {
         public void onSelect(Extra extra);
+
+        public void onRemove(Extra extra);
     }
 }

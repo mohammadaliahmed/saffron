@@ -191,27 +191,27 @@ public class ChooseMenuFragment extends Fragment {
                     if (object != null) {
                         if (object.getMeta().getMessage().equalsIgnoreCase("Successfully Added")) {
 //                            dialog.dismiss();
-//                            CommonUtils.showToast(object.getMeta().getMessage());
-//                            HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
-//                            if (map != null) {
-//                                map.put(product.getId(), product.getId());
-//                                SharedPrefs.setCartMenuIds(map);
-//                            } else {
-//                                map = new HashMap<>();
-//                                map.put(product.getId(), product.getId());
-//                                SharedPrefs.setCartMenuIds(map);
-//                            }
-//                            getCartids();
+                            CommonUtils.showToast(object.getMeta().getMessage());
+                            HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
+                            if (map != null) {
+                                map.put(product.getId(), product.getId());
+                                SharedPrefs.setCartMenuIds(map);
+                            } else {
+                                map = new HashMap<>();
+                                map.put(product.getId(), product.getId());
+                                SharedPrefs.setCartMenuIds(map);
+                            }
+                            getCartids();
                         } else if (object.getMeta().getMessage().equalsIgnoreCase("Successfully Removed")) {
 //                            dialog.dismiss();
                             CommonUtils.showToast(object.getMeta().getMessage());
                             HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
                             if (map != null) {
-                                map.remove(product.getId(), product.getId());
+                                map.remove(product.getId());
                                 SharedPrefs.setCartMenuIds(map);
                             } else {
                                 map = new HashMap<>();
-                                map.remove(product.getId(), product.getId());
+                                map.remove(product.getId());
                                 SharedPrefs.setCartMenuIds(map);
                             }
                             getCartids();
@@ -255,9 +255,11 @@ public class ChooseMenuFragment extends Fragment {
 
         RecyclerView variation = layout.findViewById(R.id.variationRecycler);
         RecyclerView extrasRecycler = layout.findViewById(R.id.extrasRecycler);
+        LinearLayout extrasLayout = layout.findViewById(R.id.extrasLayout);
 
         title.setText(product.getName());
         Glide.with(context).load(AppConfig.BASE_URL_Image + product.getImage()).into(picture);
+        final ArrayList<Integer> list = new ArrayList<>();
 
         if (product.getExtras() != null && product.getExtras().size() > 0) {
             variationLayout.setVisibility(View.VISIBLE);
@@ -265,21 +267,37 @@ public class ChooseMenuFragment extends Fragment {
                 @Override
                 public void onSelect(Extra extra) {
                     eid[0] = extra.getId();
+                    list.add(extra.getId());
+
                     CommonUtils.showToast(extra.getName());
+                }
+
+                @Override
+                public void onRemove(Extra extra) {
+                    list.remove(extra.getId());
+
                 }
             });
             variation.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false));
             variation.setAdapter(adapter2);
         }
-        extrasRecycler.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL, false));
-        ExtrasProductAdapter extrasProductAdapter = new ExtrasProductAdapter(context, MainActivity.additionalItems, new ExtrasProductAdapter.AddExtraCallback() {
-            @Override
-            public void onAdd(Product product) {
-                addExtraToCartProduct(product);
-            }
-        });
-        extrasRecycler.setAdapter(extrasProductAdapter);
+        if (Integer.parseInt(Constants.CATEGORY_CHOSEN_ID) != 5) {
+            extrasLayout.setVisibility(View.VISIBLE);
+            extrasRecycler.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL, false));
+            ExtrasProductAdapter extrasProductAdapter = new ExtrasProductAdapter(context, MainActivity.additionalItems, new ExtrasProductAdapter.AddExtraCallback() {
+                @Override
+                public void onAdd(Product product) {
+                    addExtraToCartProduct(product);
+                }
 
+                @Override
+                public void onRemove(Product product) {
+                    removeFromCartProduct(product);
+                }
+            });
+
+            extrasRecycler.setAdapter(extrasProductAdapter);
+        }
         addToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -376,6 +394,7 @@ public class ChooseMenuFragment extends Fragment {
 
 
     private void getCartids() {
+        productIdList.clear();
         HashMap<Integer, Integer> map = SharedPrefs.getCartMenuIds();
         if (map != null) {
             if (map.size() > 0) {

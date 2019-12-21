@@ -45,11 +45,9 @@ import java.util.TimeZone;
 public class CommonUtils {
 
 
-
     private CommonUtils() {
         // This utility class is not publicly instantiable
     }
-
 
 
     public static String getFullAddress(Context context, Double lat, Double lon) {
@@ -69,9 +67,6 @@ public class CommonUtils {
     }
 
 
-
-
-
     public static String getRealPathFromURI(Uri contentUri) {
         String res = null;
         String[] proj = {MediaStore.Images.Media.DATA};
@@ -83,7 +78,6 @@ public class CommonUtils {
         cursor.close();
         return res;
     }
-
 
 
     public static void showToast(final String msg) {
@@ -121,6 +115,42 @@ public class CommonUtils {
         }
     }
 
+    public static String getDate(long smsTimeInMilis) {
+        Calendar smsTime = Calendar.getInstance();
+        smsTime.setTimeInMillis(smsTimeInMilis);
+
+
+        return DateFormat.format("dd-MM-yyyy", smsTime).toString();
+
+    }
+
+    public static String getHour(long smsTimeInMilis) {
+        Calendar smsTime = Calendar.getInstance();
+        smsTime.setTimeInMillis(smsTimeInMilis);
+
+
+        return DateFormat.format("h", smsTime).toString();
+
+    }
+
+    public static String getAMPM(long smsTimeInMilis) {
+        Calendar smsTime = Calendar.getInstance();
+        smsTime.setTimeInMillis(smsTimeInMilis);
+
+
+        return DateFormat.format("aa", smsTime).toString();
+
+    }
+
+    public static String getMinute(long smsTimeInMilis) {
+        Calendar smsTime = Calendar.getInstance();
+        smsTime.setTimeInMillis(smsTimeInMilis);
+
+
+        return DateFormat.format("mm", smsTime).toString();
+
+    }
+
 
     public static double distance(double lat1, double lon1, double lat2, double lon2) {
         double theta = lon1 - lon2;
@@ -142,6 +172,7 @@ public class CommonUtils {
     public static double rad2deg(double rad) {
         return (rad * 180.0 / Math.PI);
     }
+
     public static String getLocalTime(long smsTimeInMilis, String gmt) {
         Calendar smsTime = Calendar.getInstance(TimeZone.getTimeZone(gmt));
         smsTime.setTimeInMillis(smsTimeInMilis);
@@ -178,10 +209,6 @@ public class CommonUtils {
         return DateFormat.format("h:mm aa", smsTime).toString();
 
     }
-
-
-
-
 
 
 }

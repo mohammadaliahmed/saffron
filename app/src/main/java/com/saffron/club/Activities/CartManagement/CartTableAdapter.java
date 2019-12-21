@@ -44,7 +44,7 @@ public class CartTableAdapter extends RecyclerView.Adapter<CartTableAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         final BookingModel table = itemList.get(position);
-        holder.title.setText((position + 1) + ") Table No#: " + table.getId()
+        holder.title.setText((position + 1) + ") Table No#: " + table.gettId()
                 + "\n   Persons: " + table.getPersons() + "\n   Time: " + table.getTime() + "\n   Date: " + table.getDate());
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override

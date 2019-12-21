@@ -187,6 +187,7 @@ public interface UserClient {
 
     );
 
+
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
     @POST("/web/api/cart")
     @FormUrlEncoded
@@ -204,6 +205,16 @@ public interface UserClient {
             @Header("Authorization") String auth,
             @Field("id") String id,
             @Field("eid") String eid
+
+    );
+
+
+    @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
+    @POST("/web/api/removeFromCart")
+    @FormUrlEncoded
+    Call<AddToCartResponse> removeFromCart(
+            @Header("Authorization") String auth,
+            @Field("id") String id
 
     );
 

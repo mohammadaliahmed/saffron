@@ -30,7 +30,7 @@ public class ExtrasProductAdapter extends RecyclerView.Adapter<ExtrasProductAdap
     HashMap<Integer, Integer> addedMap = new HashMap<>();
 
 
-    public ExtrasProductAdapter(Context context, List<Product> itemList,  AddExtraCallback callback) {
+    public ExtrasProductAdapter(Context context, List<Product> itemList, AddExtraCallback callback) {
         this.context = context;
         this.itemList = itemList;
         this.callback = callback;
@@ -51,7 +51,7 @@ public class ExtrasProductAdapter extends RecyclerView.Adapter<ExtrasProductAdap
         final Product product = itemList.get(position);
         boolean canAdd = true;
         if (addedMap.containsKey(product.getId())) {
-            holder.addToCart.setText("Added");
+            holder.addToCart.setText("Remove");
             holder.addToCart.setBackground(context.getResources().getDrawable(R.drawable.btn_bg_empty));
             holder.addToCart.setTextColor(context.getResources().getColor(R.color.colorSaffron));
             canAdd = false;
@@ -62,7 +62,7 @@ public class ExtrasProductAdapter extends RecyclerView.Adapter<ExtrasProductAdap
         }
 
         holder.title.setText(product.getName());
-        Glide.with(context).load(AppConfig.BASE_URL_Image+ product.getImage()).into(holder.image);
+        Glide.with(context).load(AppConfig.BASE_URL_Image + product.getImage()).into(holder.image);
         holder.price.setText("$ " + product.getPrice());
         final boolean finalCanAdd = canAdd;
         holder.addToCart.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +71,10 @@ public class ExtrasProductAdapter extends RecyclerView.Adapter<ExtrasProductAdap
                 if (finalCanAdd) {
                     callback.onAdd(product);
                     addedMap.put(product.getId(), product.getId());
+                    notifyDataSetChanged();
+                } else {
+                    callback.onRemove(product);
+                    addedMap.remove(product.getId());
                     notifyDataSetChanged();
                 }
             }
@@ -98,6 +102,8 @@ public class ExtrasProductAdapter extends RecyclerView.Adapter<ExtrasProductAdap
 
     public interface AddExtraCallback {
         public void onAdd(Product product);
+
+        public void onRemove(Product product);
     }
 
 }
