@@ -96,6 +96,8 @@ dependencies {
         //  exclude group: 'io.card'
     }
 
+    implementation 'com.squareup.okhttp3:okhttp:4.2.0'
+   
 
 }
 apply plugin: 'com.google.gms.google-services'
