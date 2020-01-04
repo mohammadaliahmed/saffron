@@ -103,6 +103,8 @@
 
         <activity android:name=".Activities.MapsActivity"></activity>
         <activity android:name=".Activities.GPSTrackerActivity" />
+        <activity android:name=".Activities.StripeCheckOut"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>
