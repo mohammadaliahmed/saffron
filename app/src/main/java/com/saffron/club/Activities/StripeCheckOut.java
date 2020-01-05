@@ -48,7 +48,7 @@ public class StripeCheckOut extends AppCompatActivity {
      * To run this app, follow the steps here: https://github.com/stripe-samples/accept-a-card-payment#how-to-run-locally
      */
     // 10.0.2.2 is the Android emulator's alias to localhost
-    private static final String BACKEND_URL = "http://10.0.2.2:4242/";
+    private static final String BACKEND_URL = "http://saffronclub.com.au/web/api/";
 
     private OkHttpClient httpClient = new OkHttpClient();
     private String paymentIntentClientSecret;
@@ -65,14 +65,15 @@ public class StripeCheckOut extends AppCompatActivity {
         // Create a PaymentIntent by calling the sample server's /create-payment-intent endpoint.
         MediaType mediaType = MediaType.get("application/json; charset=utf-8");
         String json = "{"
-                + "\"currency\":\"usd\","
+                + "\"currency\":\"aud\","
+                + "\"amount\":\"10\","
                 + "\"items\":["
                 + "{\"id\":\"photo_subscription\"}"
                 + "]"
                 + "}";
         RequestBody body = RequestBody.create(json, mediaType);
         Request request = new Request.Builder()
-                .url(BACKEND_URL + "create-payment-intent")
+                .url(BACKEND_URL + "acceptPayment")
                 .post(body)
                 .build();
         httpClient.newCall(request)
@@ -108,10 +109,10 @@ public class StripeCheckOut extends AppCompatActivity {
 
     }
 
-/*    private void displayAlert(@NonNull String title,
+   private void displayAlert(@NonNull String title,
                               @Nullable String message,
                               boolean restartDemo) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+    /*    AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(message);
         if (restartDemo) {
@@ -124,8 +125,39 @@ public class StripeCheckOut extends AppCompatActivity {
         } else {
             builder.setPositiveButton("Ok", null);
         }
-        builder.create().show();
-    }*/
+        builder.create().show();*/
+
+
+       DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+           @Override
+           public void onClick(DialogInterface dialog, int which) {
+               switch (which){
+                   case DialogInterface.BUTTON_POSITIVE:
+                       //Yes button clicked
+                       CardInputWidget cardInputWidget = findViewById(R.id.cardInputWidget);
+                       cardInputWidget.clear();
+                       startCheckout();
+                       break;
+
+                   case DialogInterface.BUTTON_NEGATIVE:
+                       //No button clicked
+                       break;
+               }
+           }
+       };
+
+       AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message)
+                .setTitle(title);
+
+       if (restartDemo) {
+       builder.setPositiveButton("Restart demo", dialogClickListener);
+       }
+       builder.setNegativeButton("Ok", dialogClickListener).show();
+
+
+
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -235,19 +267,19 @@ public class StripeCheckOut extends AppCompatActivity {
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
                 Log.e( "Payment completed",""+  gson.toJson(paymentIntent));
-               /* activity.displayAlert(
+                activity.displayAlert(
                         "Payment completed",
                         gson.toJson(paymentIntent),
                         true
-                );*/
+                );
             } else if (status == PaymentIntent.Status.RequiresPaymentMethod) {
                 // Payment failed – allow retrying using a different payment method
                 Log.e( "Payment failed",""+  paymentIntent.getLastPaymentError());
-               /* activity.displayAlert(
+                activity.displayAlert(
                         "Payment failed",
-                        Objects.requireNonNull(paymentIntent.getLastPaymentError()).message,
+                        Objects.requireNonNull(paymentIntent.getLastPaymentError()).getMessage(),
                         false
-                );*/
+                );
             }
         }
 
@@ -259,14 +291,13 @@ public class StripeCheckOut extends AppCompatActivity {
             }
 
             // Payment request failed – allow retrying using the same payment method
-        //    activity.displayAlert("Error", e.toString(), false);
+           activity.displayAlert("Error", e.toString(), false);
             Log.e( "Error ",""+ e.toString());
         }
     }
 }
 
 /*
-
 public class StripeCheckOut extends AppCompatActivity {
 
     private String paymentIntentClientSecret;
