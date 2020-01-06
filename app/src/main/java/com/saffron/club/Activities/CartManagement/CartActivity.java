@@ -34,6 +34,7 @@ import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
 import com.saffron.club.Activities.MainActivity;
 import com.saffron.club.Activities.MapsActivity;
+import com.saffron.club.Activities.StripeCheckOut;
 import com.saffron.club.Models.BookingModel;
 import com.saffron.club.Models.MenuModel;
 import com.saffron.club.Models.PaypalResponse;
@@ -176,14 +177,41 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                //Yes button clicked
+                                String title = "Saffron CLub";
+                                BigDecimal Amount = BigDecimal.valueOf(total);
+                                startPurchasePayPal(title, Amount);
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                Intent intent = new Intent(CartActivity.this, StripeCheckOut.class);
+                                startActivity(intent);
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(CartActivity.this);
+                builder.setMessage("Your Payment type?").setPositiveButton("Paypal", dialogClickListener)
+                        .setNegativeButton("Stripe", dialogClickListener).show();
+
+
+
+
 //                DropInRequest dropInRequest = new DropInRequest()
 //                        .clientToken(clientToken);
 //                startActivityForResult(dropInRequest.getIntent(CartActivity.this), REQUEST_CODE);
 //                placeOrderNow();
 
-                String title = "Saffron CLub";
+              /*  String title = "Saffron CLub";
                 BigDecimal Amount = BigDecimal.valueOf(total);
-                startPurchasePayPal(title, Amount);
+                startPurchasePayPal(title, Amount);*/
 
 
 //                if (returnString == null) {
