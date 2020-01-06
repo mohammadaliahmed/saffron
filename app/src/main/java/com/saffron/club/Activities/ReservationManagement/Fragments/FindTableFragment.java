@@ -60,8 +60,10 @@ public class FindTableFragment extends Fragment {
     public static String persons;
     public static MakeReservationResponse reservation;
     public static String date;
-    public static String time;
+    public static String time, timeTo;
     boolean today = false;
+    private String min;
+    private String mine;
 
     public FindTableFragment() {
     }
@@ -154,21 +156,20 @@ public class FindTableFragment extends Fragment {
             }
         });
 
-
         return view;
-
-
     }
 
     private void confirmBookingNow(final RelativeLayout wholeLayout) {
         wholeLayout.setVisibility(View.VISIBLE);
         date = mYear + "-" + mMonth + "-" + mDay;
-        time = mHour + ":" + mMinute + timeSet;
+        time = mHour + ":" + min + timeSet;
+        timeTo = mEHour + ":" + mine + timeSetE;
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
         Call<MakeReservationResponse> call = getResponse.bookTable(
                 SharedPrefs.getToken(),
                 date,
                 time,
+                timeTo,
                 persons
 
         );
@@ -264,7 +265,7 @@ public class FindTableFragment extends Fragment {
                             timeSet = "AM";
                         }
 
-                        String min = "";
+                        min = "";
                         if (mMinute < 10)
                             min = "0" + mMinute;
                         else
@@ -322,11 +323,11 @@ public class FindTableFragment extends Fragment {
                             timeSetE = "AM";
                         }
 
-                        String min = "";
+                        mine = "";
                         if (mEMinute < 10)
-                            min = "0" + mEMinute;
+                            mine = "0" + mEMinute;
                         else
-                            min = String.valueOf(mEMinute);
+                            mine = String.valueOf(mEMinute);
 
                         if (today) {
                             if (((hourOfDay) <= hrrr)) {
@@ -336,12 +337,12 @@ public class FindTableFragment extends Fragment {
                             } else {
 
                                 String bTime = new StringBuilder().append(mEHour).append(':')
-                                        .append(min).append(" ").append(timeSetE).toString();
+                                        .append(mine).append(" ").append(timeSetE).toString();
                                 timeOnly.setText(aTime + " -> " + bTime);
                             }
                         } else {
                             String bTime = new StringBuilder().append(mEHour).append(':')
-                                    .append(min).append(" ").append(timeSetE).toString();
+                                    .append(mine).append(" ").append(timeSetE).toString();
                             timeOnly.setText(aTime + "->" + bTime);
                         }
                     }

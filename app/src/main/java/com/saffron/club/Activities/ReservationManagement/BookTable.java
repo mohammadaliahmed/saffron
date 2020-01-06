@@ -13,12 +13,17 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.saffron.club.Activities.MainActivity;
+import com.saffron.club.Activities.ReservationManagement.Fragments.ChooseMenuFragment;
 import com.saffron.club.Activities.UserManagement.Login;
 import com.saffron.club.R;
+import com.saffron.club.Utils.CommonUtils;
+import com.saffron.club.Utils.Constants;
 import com.saffron.club.Utils.SharedPrefs;
 import com.saffron.club.Utils.StepperIndicator;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -82,11 +87,23 @@ public class BookTable extends AppCompatActivity {
     public void onBackPressed() {
 //        super.onBackPressed();
         int item = pager.getCurrentItem();
-        if (item > 0) {
-            item--;
-            pager.setCurrentItem(item);
-        }else{
-            finish();
+        if (Constants.MENU_STEP == 2) {
+            Constants.MENU_STEP = 1;
+            try {
+                ChooseMenuFragment favoritesFragment = (ChooseMenuFragment) getSupportFragmentManager()
+                        .getFragments()
+                        .get(1);
+                favoritesFragment.getDataaFromServer();
+            }catch (Exception e){
+                CommonUtils.showToast(e.getMessage());
+            }
+        } else {
+            if (item > 0) {
+                item--;
+                pager.setCurrentItem(item);
+            } else {
+                finish();
+            }
         }
     }
 }

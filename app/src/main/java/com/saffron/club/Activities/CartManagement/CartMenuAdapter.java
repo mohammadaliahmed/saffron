@@ -66,7 +66,7 @@ public class CartMenuAdapter extends RecyclerView.Adapter<CartMenuAdapter.ViewHo
                 cartCallback.onDeleteMenu(menuModel, position);
             }
         });
-        final int[] count = {1};
+        final int[] count = {menuModel.getQuantity()};
         holder.quantity.setText("" + count[0]);
 
         holder.increase.setOnClickListener(new View.OnClickListener() {
@@ -76,10 +76,10 @@ public class CartMenuAdapter extends RecyclerView.Adapter<CartMenuAdapter.ViewHo
                     count[0]++;
                     holder.quantity.setText("" + count[0]);
                     if (menuModel.getVariation() != null) {
-                        holder.price.setText("$" + count[0] * Double.parseDouble(menuModel.getVariation().getPrice()));
+                        holder.price.setText("$" + String.format("%.2f", count[0] * Double.parseDouble(menuModel.getVariation().getPrice())));
 
                     } else {
-                        holder.price.setText("$" + count[0] * Double.parseDouble(menuModel.getProduct().getPrice()));
+                        holder.price.setText("$" + String.format("%.2f", count[0] * Double.parseDouble(menuModel.getProduct().getPrice())));
 
                     }
 
@@ -96,10 +96,10 @@ public class CartMenuAdapter extends RecyclerView.Adapter<CartMenuAdapter.ViewHo
                     count[0]--;
                     holder.quantity.setText("" + count[0]);
                     if (menuModel.getVariation() != null) {
-                        holder.price.setText("$" + count[0] * Double.parseDouble(menuModel.getVariation().getPrice()));
+                        holder.price.setText("$" + String.format("%.2f", count[0] * Double.parseDouble(menuModel.getVariation().getPrice())));
 
                     } else {
-                        holder.price.setText("$" + count[0] * Double.parseDouble(menuModel.getProduct().getPrice()));
+                        holder.price.setText("$" + String.format("%.2f", count[0] * Double.parseDouble(menuModel.getProduct().getPrice())));
 
                     }
 

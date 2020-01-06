@@ -153,6 +153,7 @@ public interface UserClient {
             @Header("Authorization") String auth,
             @Field("date") String date,
             @Field("time") String time,
+            @Field("timeto") String timeTo,
             @Field("persons") String persons
 
 
@@ -207,6 +208,17 @@ public interface UserClient {
             @Field("eid") String eid
 
     );
+
+    @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})
+    @POST("/web/api/addExtraToCart")
+    @FormUrlEncoded
+    Call<AddToCartResponse> addExtraToCart(
+            @Header("Authorization") String auth,
+            @Field("id") String id,
+            @Field("eid") String eid
+
+    );
+
 
 
     @Headers({"Content-Type: application/x-www-form-urlencoded", "Accept:application/json"})

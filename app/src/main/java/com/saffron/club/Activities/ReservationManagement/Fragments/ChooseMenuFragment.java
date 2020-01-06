@@ -115,7 +115,23 @@ public class ChooseMenuFragment extends Fragment {
 
     }
 
+    public void getDataaFromServer() {
+
+        categoryAdapter = new MenuFragmentCategoryAdapter(context, MainActivity.itemList, new MenuFragmentCategoryAdapter.MenuFragmentCategoryCallbacks() {
+            @Override
+            public void onOptionChosen(Category category) {
+                Constants.CATEGORY_CHOSEN_ID = "" + category.getId();
+                getProductsFromDB();
+            }
+        });
+        recyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+
+        categoryAdapter.setItemList(MainActivity.itemList);
+        recyclerView.setAdapter(categoryAdapter);
+    }
+
     private void getProductsFromDB() {
+        productsList.clear();
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
         Call<ProductResponse> call = getResponse.getProducts(
                 SharedPrefs.getToken()
@@ -157,6 +173,7 @@ public class ChooseMenuFragment extends Fragment {
     }
 
     private void setupProductRecycler(ArrayList<Product> productsList) {
+        Constants.MENU_STEP = 2;
         getCartids();
         recyclerView.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL, false));
         productListAdapter = new ProductListAdapter(context, productsList, productIdList, new AddToCartCallback() {
@@ -321,7 +338,7 @@ public class ChooseMenuFragment extends Fragment {
 
     private void addExtraToCartProduct(final Product product) {
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
-        Call<AddToCartResponse> call = getResponse.addToCart(
+        Call<AddToCartResponse> call = getResponse.addExtraToCart(
                 SharedPrefs.getToken(), "" + product.getId(), "" + 0
         );
         call.enqueue(new Callback<AddToCartResponse>() {

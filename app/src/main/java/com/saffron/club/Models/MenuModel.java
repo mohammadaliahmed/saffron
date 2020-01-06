@@ -10,7 +10,6 @@ public class MenuModel {
     private Integer id;
 
 
-    private int quantity;
 
     @SerializedName("u_id")
     @Expose
@@ -39,6 +38,11 @@ public class MenuModel {
     @SerializedName("variation")
     @Expose
     private Extra variation;
+    @SerializedName("item_quantity")
+    @Expose
+    private int quantity;
+
+
 
     public Extra getVariation() {
         return variation;

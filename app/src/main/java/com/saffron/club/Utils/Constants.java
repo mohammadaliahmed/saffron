@@ -8,6 +8,7 @@ public class Constants {
 
 
     public static String CATEGORY_CHOSEN_ID = "";
+    public static int MENU_STEP = 1;
 
 
 }

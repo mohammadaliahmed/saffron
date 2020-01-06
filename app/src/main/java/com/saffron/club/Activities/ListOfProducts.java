@@ -396,7 +396,7 @@ public class ListOfProducts extends AppCompatActivity {
 
     private void addExtraToCartProduct(final Product product) {
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
-        Call<AddToCartResponse> call = getResponse.addToCart(
+        Call<AddToCartResponse> call = getResponse.addExtraToCart(
                 SharedPrefs.getToken(), "" + product.getId(), "" + 0
         );
         call.enqueue(new Callback<AddToCartResponse>() {
@@ -422,9 +422,8 @@ public class ListOfProducts extends AppCompatActivity {
     }
 
 
-
-
     private void getProductsDataFromDB() {
+        itemList.clear();
         UserClient getResponse = AppConfig.getRetrofit().create(UserClient.class);
         Call<ProductResponse> call = getResponse.getProducts(
                 SharedPrefs.getToken()

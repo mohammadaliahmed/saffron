@@ -587,7 +587,7 @@ public class CartActivity extends AppCompatActivity {
                         }
                         for (MenuModel menuModel : confirmBookingResponse.getConfirmBookingModel().getMenu()) {
                             if (menuModel.getProduct() != null) {
-                                menuModel.setQuantity(1);
+//                                menuModel.setQuantity(1);
                                 boolean found = false;
 //                                for (MenuModel menuModel1 : itemList) {
 //                                    if (menuModel.getProduct().getId() == menuModel1.getProduct().getId()) {
@@ -595,7 +595,7 @@ public class CartActivity extends AppCompatActivity {
 //                                    }
 //                                }
 //                                if (!found) {
-                                    itemList.add(menuModel);
+                                itemList.add(menuModel);
 //                                }
                             }
                         }
@@ -622,9 +622,9 @@ public class CartActivity extends AppCompatActivity {
     private void calculateTotal() {
         total = 0;
         for (MenuModel menuModel : itemList) {
-            if(Integer.parseInt(menuModel.getExtra())==0) {
+            if (Integer.parseInt(menuModel.getExtra() == null ? "0" : menuModel.getExtra()) == 0) {
                 total = total + (menuModel.getQuantity() * Double.parseDouble(menuModel.getProduct().getPrice()));
-            }else{
+            } else {
                 total = total + (menuModel.getQuantity() * Double.parseDouble(menuModel.getVariation().getPrice()));
 
             }
