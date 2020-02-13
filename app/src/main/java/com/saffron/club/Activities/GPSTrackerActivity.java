@@ -67,6 +67,8 @@ public class GPSTrackerActivity extends AppCompatActivity implements
             if (location != null) {
                 location.getLatitude();
                 location.getLongitude();
+                location.isFromMockProvider();
+
             } else {
 //                    CommonUtils.showToast("Null");
             }

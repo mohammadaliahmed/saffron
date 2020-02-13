@@ -1,9 +1,12 @@
 package com.saffron.club.Activities.CartManagement;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
@@ -71,6 +75,7 @@ import retrofit2.Response;
 public class CartActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 25;
+    private static final int STRIPE_PAYMENT_DONE = 105;
     TextView placeOrder;
 
     RecyclerView recyclerView, recyclerTable;
@@ -82,7 +87,7 @@ public class CartActivity extends AppCompatActivity {
     private List<BookingModel> tableList = new ArrayList<>();
     TextView totalAmount;
     private String clientToken;
-    private double total;
+    public static double total;
     private String totall;
 
     private EditText mNumber, mMonth, mYear, mCVC, mName;
@@ -176,32 +181,64 @@ public class CartActivity extends AppCompatActivity {
         placeOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//
+//                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        switch (which) {
+//                            case DialogInterface.BUTTON_POSITIVE:
+//                                //Yes button clicked
+//                                String title = "Saffron CLub";
+//                                BigDecimal Amount = BigDecimal.valueOf(total);
+//                                startPurchasePayPal(title, Amount);
+//                                break;
+//
+//                            case DialogInterface.BUTTON_NEGATIVE:
+//                                //No button clicked
+//                                Intent intent = new Intent(CartActivity.this, StripeCheckOut.class);
+//                                startActivityForResult(intent, STRIPE_PAYMENT_DONE);
+//                                break;
+//                        }
+//                    }
+//                };
+//
+//                AlertDialog.Builder builder = new AlertDialog.Builder(CartActivity.this);
+//                builder.setMessage("Your Payment type?").setPositiveButton("Paypal", dialogClickListener)
+//                        .setNegativeButton("Stripe", dialogClickListener).show();
 
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+
+                final Dialog dialog = new Dialog(CartActivity.this);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                View layout = layoutInflater.inflate(R.layout.alert_dialog_payment, null);
+
+                dialog.setContentView(layout);
+
+                ImageView paypp = layout.findViewById(R.id.paypp);
+                ImageView stri = layout.findViewById(R.id.stri);
+                stri.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                            case DialogInterface.BUTTON_POSITIVE:
-                                //Yes button clicked
-                                String title = "Saffron CLub";
-                                BigDecimal Amount = BigDecimal.valueOf(total);
-                                startPurchasePayPal(title, Amount);
-                                break;
-
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                //No button clicked
-                                Intent intent = new Intent(CartActivity.this, StripeCheckOut.class);
-                                startActivity(intent);
-                                break;
-                        }
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        Intent intent = new Intent(CartActivity.this, StripeCheckOut.class);
+                        startActivityForResult(intent, STRIPE_PAYMENT_DONE);
                     }
-                };
+                });
+                paypp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(CartActivity.this);
-                builder.setMessage("Your Payment type?").setPositiveButton("Paypal", dialogClickListener)
-                        .setNegativeButton("Stripe", dialogClickListener).show();
+                        String title = "Saffron CLub";
+                        BigDecimal Amount = BigDecimal.valueOf(total);
+                        startPurchasePayPal(title, Amount);
+                    }
+                });
 
 
+                dialog.show();
 
 
 //                DropInRequest dropInRequest = new DropInRequest()
@@ -267,7 +304,7 @@ public class CartActivity extends AppCompatActivity {
 
     }
 
-    private void placeOrderNow() {
+    private void placeOrderNow(String paymentMethod) {
         wholeLayout.setVisibility(View.VISIBLE);
 
         HashMap<String, Object> finalMap = new HashMap<>();
@@ -343,7 +380,7 @@ public class CartActivity extends AppCompatActivity {
         finalUrl = finalUrl + "&lang=" + lon;
         finalUrl = finalUrl + "&lat=" + lat;
         finalUrl = finalUrl + "&drop_location=" + CommonUtils.getFullAddress(CartActivity.this, lat, lon);
-        finalUrl = finalUrl + "&payment_method=Paypal";
+        finalUrl = finalUrl + "&payment_method=" + paymentMethod;
         finalUrl = finalUrl + "&payment_status=1";
         finalUrl = finalUrl + "&transaction_id=" + paymentId;
 
@@ -372,7 +409,6 @@ public class CartActivity extends AppCompatActivity {
                         CommonUtils.showToast(response.body().getMeta().getMessage());
                     }
                 } else {
-                    CommonUtils.showToast("There is some error");
                 }
             }
 
@@ -765,6 +801,16 @@ public class CartActivity extends AppCompatActivity {
                 Exception error = (Exception) data.getSerializableExtra(DropInActivity.EXTRA_ERROR);
             }
         }
+        if (requestCode == STRIPE_PAYMENT_DONE) {
+
+            if (data != null) {
+                paymentId = data.getStringExtra("paymentId");
+
+                placeOrderNow("Stripe");
+            } else {
+                CommonUtils.showToast("There is some error");
+            }
+        }
         if (requestCode == REQUEST_CODE_PAYMENT)
 
         {
@@ -784,7 +830,7 @@ public class CartActivity extends AppCompatActivity {
                         if (object.getResponse().getState().equalsIgnoreCase("approved")) {
                             CommonUtils.showToast("Payment successfull");
                             paymentId = object.getResponse().getId();
-                            placeOrderNow();
+                            placeOrderNow("PayPal");
 //                            finish();
                         }
                         runOnUiThread(new Runnable() {

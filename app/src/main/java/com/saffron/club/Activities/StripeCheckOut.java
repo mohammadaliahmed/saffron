@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.saffron.club.Activities.CartManagement.CartActivity;
 import com.saffron.club.R;
 import com.stripe.android.ApiResultCallback;
 import com.stripe.android.PaymentIntentResult;
@@ -42,9 +44,8 @@ import okhttp3.Response;
 
 public class StripeCheckOut extends AppCompatActivity {
     /**
-     *
      * This example collects card payments, implementing the guide here: https://stripe.com/docs/payments/accept-a-payment#android
-     *
+     * <p>
      * To run this app, follow the steps here: https://github.com/stripe-samples/accept-a-card-payment#how-to-run-locally
      */
     // 10.0.2.2 is the Android emulator's alias to localhost
@@ -54,10 +55,14 @@ public class StripeCheckOut extends AppCompatActivity {
     private String paymentIntentClientSecret;
     private Stripe stripe;
 
+    RelativeLayout wholeLayout;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stripe_check_out);
+        wholeLayout = findViewById(R.id.wholeLayout);
         startCheckout();
     }
 
@@ -66,7 +71,7 @@ public class StripeCheckOut extends AppCompatActivity {
         MediaType mediaType = MediaType.get("application/json; charset=utf-8");
         String json = "{"
                 + "\"currency\":\"aud\","
-                + "\"amount\":\"10\","
+                + "\"amount\":\"" + CartActivity.total + "\","
                 + "\"items\":["
                 + "{\"id\":\"photo_subscription\"}"
                 + "]"
@@ -96,9 +101,11 @@ public class StripeCheckOut extends AppCompatActivity {
         payButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                wholeLayout.setVisibility(View.VISIBLE);
                 CardInputWidget cardInputWidget = findViewById(R.id.cardInputWidget);
                 PaymentMethodCreateParams params = cardInputWidget.getPaymentMethodCreateParams();
                 if (params != null) {
+
                     ConfirmPaymentIntentParams confirmParams = ConfirmPaymentIntentParams
                             .createWithPaymentMethodCreateParams(params, paymentIntentClientSecret);
 //                    stripe = Stripe(this, PaymentConfiguration.getInstance(getApplicationContext()).getPublishableKey();
@@ -109,7 +116,7 @@ public class StripeCheckOut extends AppCompatActivity {
 
     }
 
-   private void displayAlert(@NonNull String title,
+    private void displayAlert(@NonNull String title,
                               @Nullable String message,
                               boolean restartDemo) {
     /*    AlertDialog.Builder builder = new AlertDialog.Builder(this)
@@ -128,33 +135,32 @@ public class StripeCheckOut extends AppCompatActivity {
         builder.create().show();*/
 
 
-       DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-           @Override
-           public void onClick(DialogInterface dialog, int which) {
-               switch (which){
-                   case DialogInterface.BUTTON_POSITIVE:
-                       //Yes button clicked
-                       CardInputWidget cardInputWidget = findViewById(R.id.cardInputWidget);
-                       cardInputWidget.clear();
-                       startCheckout();
-                       break;
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        //Yes button clicked
+                        CardInputWidget cardInputWidget = findViewById(R.id.cardInputWidget);
+                        cardInputWidget.clear();
+                        startCheckout();
+                        break;
 
-                   case DialogInterface.BUTTON_NEGATIVE:
-                       //No button clicked
-                       break;
-               }
-           }
-       };
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
 
-       AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
                 .setTitle(title);
 
-       if (restartDemo) {
-       builder.setPositiveButton("Restart demo", dialogClickListener);
-       }
-       builder.setNegativeButton("Ok", dialogClickListener).show();
-
+        if (restartDemo) {
+            builder.setPositiveButton("Restart demo", dialogClickListener);
+        }
+        builder.setNegativeButton("Ok", dialogClickListener).show();
 
 
     }
@@ -162,6 +168,7 @@ public class StripeCheckOut extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        wholeLayout.setVisibility(View.GONE);
 
         // Handle the result of stripe.confirmPayment
         stripe.onPaymentResult(requestCode, data, new PaymentResultCallback(this));
@@ -169,7 +176,8 @@ public class StripeCheckOut extends AppCompatActivity {
 
     private void onPaymentSuccess(@NonNull final Response response) throws IOException {
         Gson gson = new Gson();
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Type type = new TypeToken<Map<String, String>>() {
+        }.getType();
         Map<String, String> responseMap = gson.fromJson(
                 Objects.requireNonNull(response.body()).string(),
                 type
@@ -189,7 +197,8 @@ public class StripeCheckOut extends AppCompatActivity {
     }
 
     private static final class PayCallback implements Callback {
-        @NonNull private final WeakReference<StripeCheckOut> activityRef;
+        @NonNull
+        private final WeakReference<StripeCheckOut> activityRef;
 
         PayCallback(@NonNull StripeCheckOut activity) {
             activityRef = new WeakReference<>(activity);
@@ -245,9 +254,10 @@ public class StripeCheckOut extends AppCompatActivity {
         }
     }
 
-    private static final class PaymentResultCallback
+    private final class PaymentResultCallback
             implements ApiResultCallback<PaymentIntentResult> {
-        @NonNull private final WeakReference<StripeCheckOut> activityRef;
+        @NonNull
+        private final WeakReference<StripeCheckOut> activityRef;
 
         PaymentResultCallback(@NonNull StripeCheckOut activity) {
             activityRef = new WeakReference<>(activity);
@@ -266,15 +276,20 @@ public class StripeCheckOut extends AppCompatActivity {
                 // Payment completed successfully
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-                Log.e( "Payment completed",""+  gson.toJson(paymentIntent));
-                activity.displayAlert(
-                        "Payment completed",
-                        gson.toJson(paymentIntent),
-                        true
-                );
+                Log.e("Payment completed", "" + gson.toJson(paymentIntent));
+//                activity.displayAlert(
+//                        "Payment completed",
+//                        gson.toJson(paymentIntent),
+//                        true
+//                );
+                Intent returnIntent = getIntent();
+                returnIntent.putExtra("paymentId", paymentIntent.getId());
+
+                setResult(RESULT_OK, returnIntent);
+                finish();
             } else if (status == PaymentIntent.Status.RequiresPaymentMethod) {
                 // Payment failed – allow retrying using a different payment method
-                Log.e( "Payment failed",""+  paymentIntent.getLastPaymentError());
+                Log.e("Payment failed", "" + paymentIntent.getLastPaymentError());
                 activity.displayAlert(
                         "Payment failed",
                         Objects.requireNonNull(paymentIntent.getLastPaymentError()).getMessage(),
@@ -291,8 +306,8 @@ public class StripeCheckOut extends AppCompatActivity {
             }
 
             // Payment request failed – allow retrying using the same payment method
-           activity.displayAlert("Error", e.toString(), false);
-            Log.e( "Error ",""+ e.toString());
+            activity.displayAlert("Error", e.toString(), false);
+            Log.e("Error ", "" + e.toString());
         }
     }
 }
